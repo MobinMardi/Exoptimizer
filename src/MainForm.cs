@@ -239,10 +239,10 @@ namespace Exoptimizer
         {
             this.SuspendLayout();
             
-            // Set application icon
+            // Set application icon - updated path for new structure
             try
             {
-                string iconPath = Path.Combine(Application.StartupPath, "icon.ico");
+                string iconPath = Path.Combine(Application.StartupPath, "..", "assets", "icon.ico");
                 if (File.Exists(iconPath))
                 {
                     this.Icon = new Icon(iconPath);
@@ -1689,33 +1689,20 @@ namespace Exoptimizer
 
             try
             {
-                // Try to use the dedicated tray icon first
-                string trayIconPath = Path.Combine(Application.StartupPath, "tray_icon.png");
-                if (File.Exists(trayIconPath))
+                // Use the main application icon for system tray - updated path for new structure
+                string iconPath = Path.Combine(Application.StartupPath, "..", "assets", "icon.ico");
+                if (File.Exists(iconPath))
                 {
-                    // Load PNG and convert to Icon
-                    using var bitmap = new Bitmap(trayIconPath);
-                    // Create a 16x16 icon for system tray
-                    using var resized = new Bitmap(bitmap, new Size(16, 16));
-                    notifyIcon.Icon = Icon.FromHandle(resized.GetHicon());
+                    notifyIcon.Icon = new Icon(iconPath);
                 }
                 else
                 {
-                    // Fallback to application icon
-                    string iconPath = Path.Combine(Application.StartupPath, "icon.ico");
-                    if (File.Exists(iconPath))
-                    {
-                        notifyIcon.Icon = new Icon(iconPath);
-                    }
-                    else
-                    {
-                        notifyIcon.Icon = SystemIcons.Application;
-                    }
+                    notifyIcon.Icon = SystemIcons.Application;
                 }
             }
             catch
             {
-                // Ultimate fallback to system icon
+                // Fallback to system icon
                 notifyIcon.Icon = SystemIcons.Application;
             }
 

@@ -10,7 +10,7 @@
     <AssemblyVersion>2.0.1.0</AssemblyVersion>
     <FileVersion>2.0.1.0</FileVersion>
     <Copyright>Copyright © Exoptimizer Team 2025</Copyright>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>..\assets\icon.ico</ApplicationIcon>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="icon.ico" />
+    <Content Include="..\assets\icon.ico" />
   </ItemGroup>
 
 </Project>

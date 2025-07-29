@@ -1,4 +1,4 @@
-; Exoptimizer v2.0 Installer Script
+; Exoptimizer v2.0.1 Installer Script
 #define MyAppName "Exoptimizer - Gaming Optimization Tool"
 #define MyAppVersion "2.0.1"
 #define MyAppPublisher "mDev (Mobin Mardi)"
@@ -23,11 +23,11 @@ AppCopyright=Copyright © 2025 mDev (Mobin Mardi)
 DefaultDirName={autopf}\Exoptimizer
 DefaultGroupName=Exoptimizer
 AllowNoIcons=yes
-LicenseFile=LICENSE.txt
-InfoBeforeFile=README.txt
-OutputDir=installer
+LicenseFile=..\LICENSE.txt
+InfoBeforeFile=..\docs\README.txt
+OutputDir=output
 OutputBaseFilename=Exoptimizer-v2.0.1
-SetupIconFile=icon.ico
+SetupIconFile=..\assets\icon.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 
 ; Compression & Style
@@ -70,16 +70,15 @@ Name: "createrestorepoint"; Description: "Create system restore point before ins
 
 [Files]
 ; Main Application Files
-Source: "bin\Release\net6.0-windows\win-x64\publish\Exoptimizer.exe"; DestDir: "{app}"; DestName: "{#MyAppExeName}"; Flags: ignoreversion replacesameversion
-Source: "bin\Release\net6.0-windows\win-x64\publish\*"; DestDir: "{app}"; Excludes: "Exoptimizer.exe"; Flags: ignoreversion replacesameversion recursesubdirs createallsubdirs
+Source: "..\src\bin\Release\net6.0-windows\win-x64\publish\Exoptimizer.exe"; DestDir: "{app}"; DestName: "{#MyAppExeName}"; Flags: ignoreversion replacesameversion
+Source: "..\src\bin\Release\net6.0-windows\win-x64\publish\*"; DestDir: "{app}"; Excludes: "Exoptimizer.exe"; Flags: ignoreversion replacesameversion recursesubdirs createallsubdirs
 
 ; Documentation
-Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
-Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "..\LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "..\docs\README.txt"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 
 ; Icon
-Source: "icon.ico"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
-Source: "tray_icon.png"; DestDir: "{app}"; Flags: ignoreversion replacesameversion skipifsourcedoesntexist
+Source: "..\assets\icon.ico"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 
 [Icons]
 ; Start Menu

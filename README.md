@@ -14,7 +14,7 @@
 - 🛠️ **Performance Tools**: Quick access to Windows system utilities
 - 💾 **System Safety**: Automatic restore points and optimization rollback
 - 🌙 **Dark Mode**: Onyx Black theme with Discord Blurple accents
-- 🔔 **System Tray**: Minimize to tray with dedicated settings icon
+- 🔔 **System Tray**: Minimize to tray functionality
 
 ## 📋 System Requirements
 
@@ -41,26 +41,30 @@
 
 ## 🔧 Building from Source
 
-```bash
+\`\`\`bash
 git clone https://github.com/MobinMardi/Exoptimizer.git
 cd Exoptimizer/src
 dotnet build --configuration Release
-```
-## Changelog
+\`\`\`
+
+## 📝 Changelog
 
 See [CHANGELOG.md](docs/CHANGELOG.md) for detailed version history.
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details.
 
-## ‍ Author
+## 👨‍💻 Author
 
 **mDev (Mobin Mardi)**
-
 - GitHub: [@MobinMardi](https://github.com/MobinMardi)
 - Website: [mobinmardi.github.io](https://mobinmardi.github.io/)
+
+---
+
+⭐ **Star this repository if you find it helpful!**
