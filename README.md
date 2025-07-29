@@ -45,3 +45,22 @@
 git clone https://github.com/MobinMardi/Exoptimizer.git
 cd Exoptimizer/src
 dotnet build --configuration Release
+```
+## Changelog
+
+See [CHANGELOG.md](docs/CHANGELOG.md) for detailed version history.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details.
+
+## ‍ Author
+
+**mDev (Mobin Mardi)**
+
+- GitHub: [@MobinMardi](https://github.com/MobinMardi)
+- Website: [mobinmardi.github.io](https://mobinmardi.github.io/)
