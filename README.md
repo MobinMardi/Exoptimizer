@@ -41,11 +41,11 @@
 
 ## 🔧 Building from Source
 
-\`\`\`bash
+```bash
 git clone https://github.com/MobinMardi/Exoptimizer.git
 cd Exoptimizer/src
 dotnet build --configuration Release
-\`\`\`
+```
 
 ## 📝 Changelog
 
