@@ -1,10 +1,22 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Projects\\Exoptimizer\\Exoptimizer GitHub\\src\\",
+  "WorkspaceRootPath": "D:\\Projects\\Exoptimizer\\Exoptimizer\\src\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F51FD693-A18B-47A2-8163-1A75A78299E6}|Exoptimizer.csproj|d:\\projects\\exoptimizer\\exoptimizer github\\src\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{F51FD693-A18B-47A2-8163-1A75A78299E6}|Exoptimizer.csproj|d:\\projects\\exoptimizer\\exoptimizer\\src\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{F51FD693-A18B-47A2-8163-1A75A78299E6}|Exoptimizer.csproj|solutionrelative:mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F51FD693-A18B-47A2-8163-1A75A78299E6}|Exoptimizer.csproj|d:\\projects\\exoptimizer\\exoptimizer\\src\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F51FD693-A18B-47A2-8163-1A75A78299E6}|Exoptimizer.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F51FD693-A18B-47A2-8163-1A75A78299E6}|Exoptimizer.csproj|d:\\projects\\exoptimizer\\exoptimizer\\src\\performancemonitorform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F51FD693-A18B-47A2-8163-1A75A78299E6}|Exoptimizer.csproj|solutionrelative:performancemonitorform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F51FD693-A18B-47A2-8163-1A75A78299E6}|Exoptimizer.csproj|d:\\projects\\exoptimizer\\exoptimizer\\src\\networktestform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F51FD693-A18B-47A2-8163-1A75A78299E6}|Exoptimizer.csproj|solutionrelative:networktestform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,19 +26,58 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 3,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Projects\\Exoptimizer\\Exoptimizer\\src\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "D:\\Projects\\Exoptimizer\\Exoptimizer\\src\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-30T06:38:42.869Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PerformanceMonitorForm.cs",
+              "DocumentMoniker": "D:\\Projects\\Exoptimizer\\Exoptimizer\\src\\PerformanceMonitorForm.cs",
+              "RelativeDocumentMoniker": "PerformanceMonitorForm.cs",
+              "ToolTip": "D:\\Projects\\Exoptimizer\\Exoptimizer\\src\\PerformanceMonitorForm.cs",
+              "RelativeToolTip": "PerformanceMonitorForm.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAAAWwB0AAABeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-30T06:38:42.295Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "NetworkTestForm.cs",
+              "DocumentMoniker": "D:\\Projects\\Exoptimizer\\Exoptimizer\\src\\NetworkTestForm.cs",
+              "RelativeDocumentMoniker": "NetworkTestForm.cs",
+              "ToolTip": "D:\\Projects\\Exoptimizer\\Exoptimizer\\src\\NetworkTestForm.cs",
+              "RelativeToolTip": "NetworkTestForm.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAWwBoAAABeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-30T06:38:41.69Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "MainForm.cs",
-              "DocumentMoniker": "D:\\Projects\\Exoptimizer\\Exoptimizer GitHub\\src\\MainForm.cs",
+              "DocumentMoniker": "D:\\Projects\\Exoptimizer\\Exoptimizer\\src\\MainForm.cs",
               "RelativeDocumentMoniker": "MainForm.cs",
-              "ToolTip": "D:\\Projects\\Exoptimizer\\Exoptimizer GitHub\\src\\MainForm.cs",
+              "ToolTip": "D:\\Projects\\Exoptimizer\\Exoptimizer\\src\\MainForm.cs",
               "RelativeToolTip": "MainForm.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAJ0GAAAAAAAAAAAewKkGAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-29T10:40:53.414Z",
+              "WhenOpened": "2025-07-30T06:38:38.469Z",
               "EditorCaption": ""
             }
           ]

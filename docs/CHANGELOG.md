@@ -1,5 +1,14 @@
 # Exoptimizer Changelog
 
+## Version 2.0.2
+### 🐛 Bug Fixes & Improvements
+- Fixed application and system tray icon loading to properly use custom icon.ico
+- Improved icon path resolution with fallback mechanisms
+- Updated all version references throughout the application
+- Enhanced icon loading reliability across all forms and system tray
+
+---
+
 ## Version 2.0.1
 ### 🐛 Bug Fixes & Minor Improvements
 - Renamed VALORANT priority button variables for better code clarity
@@ -103,7 +112,7 @@
 *For support and updates, visit: https://mobinmardi.github.io/*
 \`\`\`
 
-```plaintext file="LICENSE.txt"
+\`\`\`plaintext file="LICENSE.txt"
 MIT License
 
 Copyright (c) 2025 mDev

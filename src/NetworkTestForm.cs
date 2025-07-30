@@ -21,13 +21,22 @@ namespace Exoptimizer
         {
             this.SuspendLayout();
 
-            // Set application icon - updated path for new structure
+            // Set application icon
             try
             {
-                string iconPath = System.IO.Path.Combine(Application.StartupPath, "..", "assets", "icon.ico");
+                string iconPath = System.IO.Path.Combine(Application.StartupPath, "icon.ico");
                 if (System.IO.File.Exists(iconPath))
                 {
                     this.Icon = new Icon(iconPath);
+                }
+                else
+                {
+                    // Try alternative path
+                    iconPath = System.IO.Path.Combine(Application.StartupPath, "..", "assets", "icon.ico");
+                    if (System.IO.File.Exists(iconPath))
+                    {
+                        this.Icon = new Icon(iconPath);
+                    }
                 }
             }
             catch

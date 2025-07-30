@@ -1,6 +1,6 @@
 # 🎮 Exoptimizer - Advanced Gaming Optimization Tool
 
-[![Version](https://img.shields.io/badge/version-2.0.1-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
+[![Version](https://img.shields.io/badge/version-2.0.2-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey.svg)]()
 

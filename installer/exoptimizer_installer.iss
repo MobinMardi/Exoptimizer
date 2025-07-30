@@ -1,6 +1,6 @@
-; Exoptimizer v2.0.1 Installer Script
+; Exoptimizer v2.0.2 Installer Script
 #define MyAppName "Exoptimizer - Gaming Optimization Tool"
-#define MyAppVersion "2.0.1"
+#define MyAppVersion "2.0.2"
 #define MyAppPublisher "mDev (Mobin Mardi)"
 #define MyAppURL "https://mobinmardi.github.io/"
 #define MyAppExeName "Exoptimizer.exe"
@@ -26,7 +26,7 @@ AllowNoIcons=yes
 LicenseFile=..\LICENSE.txt
 InfoBeforeFile=..\docs\README.txt
 OutputDir=output
-OutputBaseFilename=Exoptimizer-v2.0.1
+OutputBaseFilename=Exoptimizer-v2.0.2
 SetupIconFile=..\assets\icon.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 
@@ -46,12 +46,12 @@ UninstallDisplayName={#MyAppName} v{#MyAppVersion}
 UninstallFilesDir={app}\uninstall
 
 ; Version Info
-VersionInfoVersion=2.0.1
+VersionInfoVersion=2.0.2
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoDescription={#MyAppName} Setup
 VersionInfoCopyright=Copyright © 2025 mDev (Mobin Mardi)
 VersionInfoProductName={#MyAppName}
-VersionInfoProductVersion=2.0.1
+VersionInfoProductVersion=2.0.2
 
 ; Upgrade Settings
 AppMutex=ExoptimizerAppMutex
@@ -98,7 +98,7 @@ Name: "{userstartup}\Exoptimizer"; Filename: "{app}\{#MyAppExeName}"; Tasks: run
 [Registry]
 ; Add to Windows Programs list
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "DisplayName"; ValueData: "{#MyAppName} v{#MyAppVersion}"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "DisplayVersion"; ValueData: "2.0.1"
+Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "DisplayVersion"; ValueData: "2.0.2"
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "Publisher"; ValueData: "{#MyAppPublisher}"
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "UninstallString"; ValueData: "{uninstallexe}"
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "InstallLocation"; ValueData: "{app}"
@@ -188,7 +188,7 @@ begin
       WizardForm.ProgressGauge.Style := npbstMarquee;
       
       try
-        RestorePointDescription := 'Before Exoptimizer v2.0.1 Installation';
+        RestorePointDescription := 'Before Exoptimizer v2.0.2 Installation';
         
         // Create restore point using PowerShell
         if Exec('powershell.exe',
@@ -213,7 +213,7 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then begin
-    MsgBox('Exoptimizer v2.0.1 has been installed successfully!' + #13#10 + #13#10 +
+    MsgBox('Exoptimizer v2.0.2 has been installed successfully!' + #13#10 + #13#10 +
            'IMPORTANT REMINDERS:' + #13#10 +
            '• Always run Exoptimizer as Administrator' + #13#10 +
            '• Create a restore point before optimization' + #13#10 +
