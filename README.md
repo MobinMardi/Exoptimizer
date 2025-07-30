@@ -1,6 +1,6 @@
 <div align="center">
-  <a href="assets/icon.png" target="_blank">
-    <img width="180" src="assets/icon.png" alt="Exoptimizer">
+  <a href="assets/icon.ico" target="_blank">
+    <img width="180" src="assets/icon.ico" alt="Exoptimizer">
   </a>
 </div>
 
