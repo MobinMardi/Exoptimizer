@@ -1,8 +1,19 @@
-# 🎮 Exoptimizer - Advanced Gaming Optimization Tool
+<div align="center">
+  <a href="/assets/icon.ico" target="_blank">
+    <img width="180" src="assets/icon.ico" alt="Exoptimizer">
+  </a>
+</div>
 
-[![Version](https://img.shields.io/badge/version-2.0.2-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
-[![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey.svg)]()
+<h1 align="center">Exoptimizer</h1>
+
+<div align="center">
+
+  [![Version](https://img.shields.io/badge/version-2.0.2-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
+  [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
+  [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey.svg)]()
+
+</div>
+
 
 **Exoptimizer** is a comprehensive Windows gaming optimization tool designed to maximize system performance for gaming. With an intuitive modern interface, real-time monitoring, and advanced optimization features.
 
