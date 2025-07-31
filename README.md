@@ -183,4 +183,4 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 
 ⭐ **Star this repository if you find it helpful!**
 
-**Version**: 2.1.2 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2025 - Licensed under MIT License
+**Copyright**: © 2025 mDev (Mobin Mardi) - Licensed under MIT License
