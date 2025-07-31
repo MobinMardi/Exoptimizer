@@ -26,6 +26,7 @@ namespace Exoptimizer
         private bool valorantPriorityActive = false;
         private bool systemTrayEnabled = false;
         private bool allowVisible = true;
+        private bool isExtremeOptimized = false;
 
         // Control references
         private Button? optimizeButton;
@@ -458,8 +459,9 @@ namespace Exoptimizer
 
             // Check current optimization status
             CheckOptimizationStatus();
+            CheckExtremeOptimizationStatus(); // Add this new check
 
-            // Buttons
+            // Buttons in horizontal layout: Optimize System, Quick Boost, Extreme Optimization, Longer Battery
             optimizeButton = CreateModernButton(
                 isOptimized ? "✓ System Optimized" : "Optimize System", 
                 isOptimized ? SuccessColor : PrimaryColor, 
@@ -472,15 +474,35 @@ namespace Exoptimizer
             var quickButton = CreateModernButton("Quick Boost", SuccessColor, new Point(150, 20), new Size(120, 40));
             quickButton.Click += (s, e) => MessageBox.Show("Quick optimization applied!", "Exoptimizer", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            var batteryButton = CreateModernButton("Longer Battery", Color.FromArgb(168, 85, 247), new Point(280, 20), new Size(130, 40));
+            var extremeOptimizeButton = CreateModernButton(
+                isExtremeOptimized ? "✓ Extreme Applied" : "Extreme Optimization", 
+                isExtremeOptimized ? SuccessColor : DangerColor, // Red theme when not applied, green when applied
+                new Point(280, 20), // Position after Quick Boost
+                new Size(160, 40)
+            );
+            extremeOptimizeButton.Click += ExtremeOptimizeButton_Click;
+            if (isExtremeOptimized) extremeOptimizeButton.Enabled = false;
+
+            var batteryButton = CreateModernButton("Longer Battery", Color.FromArgb(168, 85, 247), new Point(450, 20), new Size(130, 40));
             batteryButton.Click += BatteryOptimizeButton_Click;
+
+            // Add warning text for extreme optimization below the buttons
+            var extremeWarningLabel = new Label
+            {
+                Text = "Extreme Optimization: \n⚠️ WARNING: Extreme mode disables many Windows features for maximum FPS. Use with caution!",
+                Location = new Point(0, 120), // Position under extreme button
+                Size = new Size(350, 50),
+                ForeColor = DangerColor,
+                Font = new Font("Segoe UI", 8F, FontStyle.Italic),
+                BackColor = Color.Transparent
+            };
 
             // Battery description
             var batteryDescLabel = new Label
             {
-                Text = "Optimizes power settings for extended battery life during power outages and when unplugged from AC power source",
-                Location = new Point(280, 70),
-                Size = new Size(350, 40),
+                Text = "Longer Batery: \nOptimizes power settings for extended battery life during power outages and when unplugged from AC power source",
+                Location = new Point(0, 170), // Position under battery button
+                Size = new Size(300, 40),
                 ForeColor = Color.FromArgb(168, 85, 247),
                 Font = new Font("Segoe UI", 8F, FontStyle.Italic),
                 BackColor = Color.Transparent
@@ -490,37 +512,15 @@ namespace Exoptimizer
             defenderCheckBox = new CheckBox
             {
                 Text = "Disable Windows Defender (Advanced)",
-                Location = new Point(0, 120),
+                Location = new Point(0, 75),
                 Size = new Size(300, 25),
                 ForeColor = WarningColor,
                 Font = new Font("Segoe UI", 9F),
                 BackColor = Color.Transparent
             };
 
-            // Status
-            statusLabel = new Label
-            {
-                Text = isOptimized ? "System is optimized" : "Ready to optimize",
-                Location = new Point(0, 155),
-                Size = new Size(300, 25),
-                ForeColor = isOptimized ? SuccessColor : TextSecondary,
-                Font = new Font("Segoe UI", 10F),
-                BackColor = Color.Transparent
-            };
-
-            // Features list
-            var featuresList = new Label
-            {
-                Text = "Gaming Optimization Features:" + Environment.NewLine + "• Disable unnecessary services" + Environment.NewLine + "• Optimize network settings" + Environment.NewLine + "• Configure power management" + Environment.NewLine + "• Apply registry tweaks",
-                Location = new Point(0, 190),
-                Size = new Size(400, 100),
-                ForeColor = TextSecondary,
-                Font = new Font("Segoe UI", 9F),
-                BackColor = Color.Transparent
-            };
-
             optimizationCard.Controls.AddRange(new Control[] { 
-                optimizeButton, quickButton, batteryButton, batteryDescLabel, defenderCheckBox, statusLabel, featuresList 
+                optimizeButton, quickButton, extremeOptimizeButton, batteryButton, extremeWarningLabel, batteryDescLabel, defenderCheckBox
             });
 
             contentPanel.Controls.AddRange(new Control[] { titleLabel, descLabel, optimizationCard });
@@ -634,6 +634,105 @@ namespace Exoptimizer
             return false;
         }
 
+        private void CheckExtremeOptimizationStatus()
+        {
+            try
+            {
+                bool extremeServicesDisabled = CheckExtremeServicesDisabled();
+                bool visualEffectsDisabled = CheckVisualEffectsDisabled();
+                bool defenderCompletelyDisabled = CheckDefenderCompletelyDisabled();
+        
+                // Consider extreme optimization applied if at least 2 out of 3 categories are applied
+                int extremeOptimizedCount = 0;
+                if (extremeServicesDisabled) extremeOptimizedCount++;
+                if (visualEffectsDisabled) extremeOptimizedCount++;
+                if (defenderCompletelyDisabled) extremeOptimizedCount++;
+        
+                isExtremeOptimized = extremeOptimizedCount >= 2;
+            }
+            catch
+            {
+                isExtremeOptimized = false;
+            }
+        }
+
+        private bool CheckExtremeServicesDisabled()
+        {
+            try
+            {
+                // Check if key extreme services are disabled
+                string[] extremeServices = { "BITS", "EventLog", "WinDefend", "WdNisSvc", "DiagTrack" };
+                int disabledCount = 0;
+        
+                foreach (string service in extremeServices)
+                {
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = "sc",
+                        Arguments = $"qc \"{service}\"",
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        RedirectStandardOutput = true
+                    };
+        
+                    using var process = Process.Start(psi);
+                    if (process != null)
+                    {
+                        process.WaitForExit();
+                        string output = process.StandardOutput.ReadToEnd();
+                        if (output.Contains("START_TYPE") && output.Contains("DISABLED"))
+                        {
+                            disabledCount++;
+                        }
+                    }
+                }
+        
+                return disabledCount >= 3; // At least 3 out of 5 extreme services disabled
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool CheckVisualEffectsDisabled()
+        {
+            try
+            {
+                var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects");
+                if (key != null)
+                {
+                    var value = key.GetValue("VisualFXSetting");
+                    if (value != null && value.ToString() == "2") // Custom settings (disabled)
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch { }
+    
+            return false;
+        }
+
+        private bool CheckDefenderCompletelyDisabled()
+        {
+            try
+            {
+                var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Policies\Microsoft\Windows Defender");
+                if (key != null)
+                {
+                    var value = key.GetValue("DisableAntiSpyware");
+                    if (value != null && value.ToString() == "1")
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch { }
+    
+            return false;
+        }
+
         private void LoadValorantContent()
         {
             if (contentPanel == null) return;
@@ -695,19 +794,8 @@ namespace Exoptimizer
                 BackColor = Color.Transparent
             };
 
-            // Priority info
-            var priorityInfoLabel = new Label
-            {
-                Text = "• High process priority" + Environment.NewLine + "• Network QoS optimization" + Environment.NewLine + "• Reduced input lag",
-                Location = new Point(0, 105),
-                Size = new Size(300, 60),
-                ForeColor = TextSecondary,
-                Font = new Font("Segoe UI", 9F),
-                BackColor = Color.Transparent
-            };
-
             valorantCard.Controls.AddRange(new Control[] { 
-                priorityHeaderLabel, valorantEnablePriority, valorantDisablePriority, valorantStatusLabel, priorityInfoLabel 
+                priorityHeaderLabel, valorantEnablePriority, valorantDisablePriority, valorantStatusLabel
             });
 
             contentPanel.Controls.AddRange(new Control[] { titleLabel, descLabel, valorantCard });
@@ -1161,7 +1249,7 @@ namespace Exoptimizer
 
             var versionInfo = new Label
             {
-                Text = "Version: 2.0.2" + Environment.NewLine + "mDev (Mobin Mardi)" + Environment.NewLine + "Copyright © 2025",
+                Text = "Version: 2.1.2" + Environment.NewLine + "mDev (Mobin Mardi)" + Environment.NewLine + "Copyright © 2025",
                 Location = new Point(0, 210),
                 Size = new Size(300, 75),
                 ForeColor = TextSecondary,
@@ -2159,6 +2247,345 @@ namespace Exoptimizer
             }
         }
 
+        private void ExtremeOptimizeButton_Click(object sender, EventArgs e)
+        {
+            if (isExtremeOptimized)
+            {
+                MessageBox.Show("Extreme optimization is already applied!" + Environment.NewLine + Environment.NewLine + "Use 'Undo Optimizations' if you want to reset and re-apply extreme optimizations.", "Exoptimizer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            var result = MessageBox.Show(
+                "⚠️ EXTREME OPTIMIZATION WARNING ⚠️" + Environment.NewLine + Environment.NewLine +
+                "This will apply AGGRESSIVE optimizations that may:" + Environment.NewLine +
+                "• Disable many Windows features and services" + Environment.NewLine +
+                "• Turn off Windows visual effects completely" + Environment.NewLine +
+                "• Disable Windows Defender real-time protection" + Environment.NewLine +
+                "• Stop Windows Update and telemetry services" + Environment.NewLine +
+                "• Disable startup programs and background apps" + Environment.NewLine +
+                "• Apply extreme power and CPU settings" + Environment.NewLine + Environment.NewLine +
+                "⚠️ ONLY USE IF YOU UNDERSTAND THE RISKS ⚠️" + Environment.NewLine +
+                "System restore point will be created automatically." + Environment.NewLine + Environment.NewLine +
+                "Continue with EXTREME optimization?",
+                "Extreme Gaming Optimization",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                ApplyExtremeOptimizations();
+            }
+        }
+
+        private void ApplyExtremeOptimizations()
+        {
+            try
+            {
+                if (statusLabel != null)
+                {
+                    statusLabel.Text = "Applying EXTREME optimizations...";
+                    statusLabel.ForeColor = DangerColor;
+                }
+
+                // Create restore point first
+                CreateRestorePoint();
+
+                // Apply regular optimizations first
+                ApplyOptimizations();
+
+                // Now apply extreme optimizations
+                ApplyExtremeGameModeOptimizations();
+                DisableWindowsVisualEffects();
+                DisableBackgroundAppsAndServices();
+                ApplyExtremeNetworkOptimizations();
+                ApplyExtremeRegistryTweaks();
+                DisableWindowsDefenderCompletely();
+                DisableStartupPrograms();
+                ApplyExtremeMemoryOptimizations();
+
+                if (statusLabel != null)
+                {
+                    statusLabel.Text = "EXTREME optimization complete - RESTART REQUIRED";
+                    statusLabel.ForeColor = DangerColor;
+                }
+
+                MessageBox.Show(
+                    "🔥 EXTREME OPTIMIZATION COMPLETED! 🔥" + Environment.NewLine + Environment.NewLine +
+                    "Your system has been optimized for maximum gaming performance." + Environment.NewLine +
+                    "Many Windows features have been disabled for FPS gains." + Environment.NewLine + Environment.NewLine +
+                    "⚠️ RESTART YOUR COMPUTER NOW FOR CHANGES TO TAKE EFFECT ⚠️" + Environment.NewLine + Environment.NewLine +
+                    "If you experience issues, use 'Undo Optimizations' or System Restore.",
+                    "Extreme Optimization Complete",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+                
+                isExtremeOptimized = true;
+
+                // Update the extreme button if it exists
+                if (contentPanel != null)
+                {
+                    foreach (Control control in contentPanel.Controls)
+                    {
+                        if (control is Panel panel)
+                        {
+                            foreach (Control panelControl in panel.Controls)
+                            {
+                                if (panelControl is Button btn && btn.Text.Contains("Extreme"))
+                                {
+                                    btn.Text = "✓ Extreme Applied";
+                                    btn.BackColor = SuccessColor;
+                                    btn.Enabled = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (statusLabel != null)
+                {
+                    statusLabel.Text = "Extreme optimization failed";
+                    statusLabel.ForeColor = DangerColor;
+                }
+
+                MessageBox.Show($"Error during extreme optimization: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private static void ApplyExtremeGameModeOptimizations()
+        {
+            // Disable even more services for extreme performance
+            string[] extremeServices = {
+                // Additional services to disable for extreme mode
+                "BITS", "EventLog", "gpsvc", "iphlpsvc", "LanmanServer", "MMCSS",
+                "MpsSvc", "NlaSvc", "nsi", "RasMan", "Schedule", "SENS", "ShellHWDetection",
+                "Spooler", "SSDPSRV", "SstpSvc", "swprv", "TapiSrv", "TrkWks", "upnphost",
+                "VSS", "W32Time", "WbioSrvc", "wcncsvc", "WdiServiceHost", "WdiSystemHost",
+                "WebClient", "Wecsvc", "wercplsupport", "WerSvc", "WinHttpAutoProxySvc",
+                "Winmgmt", "WinRM", "WMPNetworkSvc", "WPCSvc", "WPDBusEnum", "wscsvc",
+                "WSearch", "wuauserv", "WwanSvc", "XblAuthManager", "XblGameSave", "XboxGipSvc",
+                "XboxNetApiSvc", "DiagTrack", "dmwappushservice", "lfsvc", "MapsBroker",
+                "NetTcpPortSharing", "RemoteAccess", "RemoteRegistry", "SharedAccess",
+                "SysMain", "Themes", "WbioSrvc", "WMPNetworkSvc", "WpcMonSvc", "SessionEnv",
+                "TermService", "UmRdpService", "RpcLocator", "FontCache", "stisvc", "wisvc",
+                "PcaSvc", "CscService", "defragsvc", "UsoSvc", "WaaSMedicSvc", "DoSvc"
+            };
+
+            foreach (string service in extremeServices)
+            {
+                try
+                {
+                    RunCommand($"sc config \"{service}\" start= disabled");
+                    RunCommand($"sc stop \"{service}\"");
+                }
+                catch { }
+            }
+
+            // Set extreme power settings
+            RunCommand("powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"); // High Performance
+            RunCommand("powercfg -change -monitor-timeout-ac 0");
+            RunCommand("powercfg -change -disk-timeout-ac 0");
+            RunCommand("powercfg -change -standby-timeout-ac 0");
+            RunCommand("powercfg -change -hibernate-timeout-ac 0");
+        }
+
+        private static void DisableWindowsVisualEffects()
+        {
+            try
+            {
+                // Disable all visual effects for maximum performance
+                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects", 
+                    "VisualFXSetting", 2, RegistryValueKind.DWord); // Custom settings
+
+                // Disable individual visual effects
+                Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "DragFullWindows", "0", RegistryValueKind.String);
+                Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "MenuShowDelay", "0", RegistryValueKind.String);
+                Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop\WindowMetrics", "MinAnimate", "0", RegistryValueKind.String);
+                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", 
+                    "ListviewAlphaSelect", 0, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", 
+                    "TaskbarAnimations", 0, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", 
+                    "ListviewShadow", 0, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM", 
+                    "EnableAeroPeek", 0, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM", 
+                    "AlwaysHibernateThumbnails", 0, RegistryValueKind.DWord);
+            }
+            catch { }
+        }
+
+        private static void DisableBackgroundAppsAndServices()
+        {
+            try
+            {
+                // Disable background apps
+                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications", 
+                    "GlobalUserDisabled", 1, RegistryValueKind.DWord);
+
+                // Disable startup delay
+                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize", 
+                    "StartupDelayInMSec", 0, RegistryValueKind.DWord);
+
+                // Disable Windows tips and suggestions
+                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", 
+                    "SystemPaneSuggestionsEnabled", 0, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", 
+                    "SoftLandingEnabled", 0, RegistryValueKind.DWord);
+            }
+            catch { }
+        }
+
+        private static void ApplyExtremeNetworkOptimizations()
+        {
+            string[] networkCommands = {
+                "netsh int tcp set global autotuninglevel=disabled",
+                "netsh int tcp set global chimney=enabled",
+                "netsh int tcp set global rss=enabled",
+                "netsh int tcp set global netdma=enabled",
+                "netsh int tcp set global dca=enabled",
+                "netsh int tcp set global rsc=disabled",
+                "netsh int tcp set heuristics disabled",
+                "netsh int tcp set global nonsackrttresiliency=disabled",
+                "netsh int tcp set supplemental internet congestionprovider=ctcp",
+                "netsh int tcp set global timestamps=disabled",
+                "netsh int tcp set global initialRto=2000",
+                "netsh int tcp set global maxsynretransmissions=2",
+                "netsh interface ipv4 set subinterface \"Local Area Connection\" mtu=1500 store=persistent",
+                "netsh interface ipv4 set subinterface \"Ethernet\" mtu=1500 store=persistent",
+                "netsh interface ipv4 set subinterface \"Wi-Fi\" mtu=1500 store=persistent"
+            };
+
+            foreach (string command in networkCommands)
+            {
+                try { RunCommand(command); }
+                catch { }
+            }
+        }
+
+        private static void ApplyExtremeRegistryTweaks()
+        {
+            try
+            {
+                // Extreme CPU scheduling for programs
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\PriorityControl", 
+                    "Win32PrioritySeparation", 38, RegistryValueKind.DWord);
+
+                // Disable CPU throttling
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling", 
+                    "PowerThrottlingOff", 1, RegistryValueKind.DWord);
+
+                // Gaming mode registry tweaks
+                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\GameBar", 
+                    "AllowAutoGameMode", 1, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\GameBar", 
+                    "AutoGameModeEnabled", 1, RegistryValueKind.DWord);
+
+                // Disable fullscreen optimizations globally
+                Registry.SetValue(@"HKEY_CURRENT_USER\System\GameConfigStore", 
+                    "GameDVR_Enabled", 0, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_CURRENT_USER\System\GameConfigStore", 
+                    "GameDVR_FSEBehaviorMode", 2, RegistryValueKind.DWord);
+
+                // Memory management tweaks
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management", 
+                    "ClearPageFileAtShutdown", 0, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management", 
+                    "DisablePagingExecutive", 1, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management", 
+                    "LargeSystemCache", 0, RegistryValueKind.DWord);
+
+                // Disable Windows Error Reporting
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Windows Error Reporting", 
+                    "Disabled", 1, RegistryValueKind.DWord);
+
+                // Disable telemetry completely
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection", 
+                    "AllowTelemetry", 0, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection", 
+                    "AllowTelemetry", 0, RegistryValueKind.DWord);
+            }
+            catch { }
+        }
+
+        private static void DisableWindowsDefenderCompletely()
+        {
+            try
+            {
+                // Disable Windows Defender completely
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender", 
+                    "DisableAntiSpyware", 1, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection", 
+                    "DisableRealtimeMonitoring", 1, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection", 
+                    "DisableBehaviorMonitoring", 1, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection", 
+                    "DisableOnAccessProtection", 1, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection", 
+                    "DisableScanOnRealtimeEnable", 1, RegistryValueKind.DWord);
+
+                // Disable Windows Defender services
+                RunCommand("sc config \"WinDefend\" start= disabled");
+                RunCommand("sc config \"WdNisSvc\" start= disabled");
+                RunCommand("sc config \"Sense\" start= disabled");
+                RunCommand("sc config \"WdNisDrv\" start= disabled");
+                RunCommand("sc config \"WdBoot\" start= disabled");
+                RunCommand("sc config \"WdFilter\" start= disabled");
+            }
+            catch { }
+        }
+
+        private static void DisableStartupPrograms()
+        {
+            try
+            {
+                // Disable common startup programs that can impact gaming
+                string[] startupPrograms = {
+                    "Microsoft Teams", "Skype", "Spotify", "Discord", "Steam", "Epic Games Launcher",
+                    "Adobe Updater", "Java Update Scheduler", "Office", "OneDrive", "Cortana"
+                };
+
+                foreach (string program in startupPrograms)
+                {
+                    try
+                    {
+                        RunCommand($"wmic startup where \"name='{program}'\" call disable");
+                    }
+                    catch { }
+                }
+
+                // Disable startup delay
+                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize", 
+                    "StartupDelayInMSec", 0, RegistryValueKind.DWord);
+            }
+            catch { }
+        }
+
+        private static void ApplyExtremeMemoryOptimizations()
+        {
+            try
+            {
+                // Memory and cache optimizations
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management", 
+                    "IoPageLockLimit", 983040, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem", 
+                    "ContigFileAllocSize", 1536, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem", 
+                    "DisableNTFSLastAccessUpdate", 1, RegistryValueKind.DWord);
+
+                // Disable prefetch and superfetch completely
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters", 
+                    "EnablePrefetcher", 0, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters", 
+                    "EnableSuperfetch", 0, RegistryValueKind.DWord);
+            }
+            catch { }
+        }
+
         private void ValorantEnableButton_Click(object sender, EventArgs e)
         {
             try
@@ -2282,6 +2709,9 @@ namespace Exoptimizer
                 // Reset power plan to Balanced
                 RunCommand("powercfg -setactive 381b4222-f694-41f0-9685-ff5bb260df2e");
 
+                // Add this line to undo extreme optimizations as well
+                UndoExtremeOptimizations();
+                
                 isOptimized = false;
                 
                 if (statusLabel != null)
@@ -2296,6 +2726,29 @@ namespace Exoptimizer
                     optimizeButton.BackColor = PrimaryColor;
                     optimizeButton.Enabled = true;
                 }
+                
+                isExtremeOptimized = false;
+
+                // And update the extreme button if it exists
+                if (contentPanel != null)
+                {
+                    foreach (Control control in contentPanel.Controls)
+                    {
+                        if (control is Panel panel)
+                        {
+                            foreach (Control panelControl in panel.Controls)
+                            {
+                                if (panelControl is Button btn && btn.Text.Contains("Extreme"))
+                                {
+                                    btn.Text = "Extreme Optimization";
+                                    btn.BackColor = DangerColor;
+                                    btn.Enabled = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
 
                 MessageBox.Show("Optimizations undone." + Environment.NewLine + Environment.NewLine + "Restart recommended.", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -2303,6 +2756,33 @@ namespace Exoptimizer
             {
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private static void UndoExtremeOptimizations()
+        {
+            try
+            {
+                // Re-enable critical services
+                string[] criticalServices = { "WinDefend", "WdNisSvc", "wuauserv", "UsoSvc", "BITS", "EventLog" };
+                
+                foreach (string service in criticalServices)
+                {
+                    RunCommand($"sc config \"{service}\" start= auto");
+                }
+
+                // Reset visual effects to default
+                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects", 
+                    "VisualFXSetting", 0, RegistryValueKind.DWord);
+
+                // Re-enable Windows Defender
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender", 
+                    "DisableAntiSpyware", 0, RegistryValueKind.DWord);
+
+                // Reset telemetry to default
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection", 
+                    "AllowTelemetry", 1, RegistryValueKind.DWord);
+            }
+            catch { }
         }
 
         // Optimization methods
@@ -2313,7 +2793,7 @@ namespace Exoptimizer
                 var psi = new ProcessStartInfo
                 {
                     FileName = "powershell.exe",
-                    Arguments = "-Command \"Checkpoint-Computer -Description 'Exoptimizer v2.0.2 Backup' -RestorePointType 'MODIFY_SETTINGS'\"",
+                    Arguments = "-Command \"Checkpoint-Computer -Description 'Exoptimizer v2.1.2 Backup' -RestorePointType 'MODIFY_SETTINGS'\"",
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };

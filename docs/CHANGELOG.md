@@ -1,5 +1,42 @@
 # Exoptimizer Changelog
 
+## Version 2.1.2
+### 🔥 NEW FEATURE: Extreme Optimization Mode
+- **Extreme Optimization Button** - New red-themed button for maximum FPS boost
+- **Aggressive Service Disabling** - Disables 50+ unnecessary Windows services
+- **Complete Visual Effects Removal** - Removes all Windows animations and effects
+- **Advanced Registry Tweaks** - Extreme CPU scheduling and memory optimizations
+- **Windows Defender Complete Disable** - Fully disables real-time protection for gaming
+- **Background Apps Termination** - Stops all non-essential background processes
+- **Network Gaming Optimization** - Advanced network settings for competitive gaming
+- **Startup Program Management** - Disables resource-heavy startup applications
+
+### ⚠️ Safety & Warning System
+- **Automatic Restore Point Creation** - Creates restore point before extreme changes
+- **Enhanced Warning Messages** - Clear warnings about extreme optimization risks
+- **Improved Undo Functionality** - Better rollback for extreme optimizations
+- **System Stability Monitoring** - Recommendations for safe usage
+
+### 🎮 Gaming Performance Enhancements
+- **VALORANT-Specific Optimizations** - Tailored tweaks for competitive VALORANT
+- **FPS Boost Prioritization** - Focus on frame rate improvements
+- **Input Lag Reduction** - Minimized system latency for competitive gaming
+- **Memory Management Optimization** - Advanced RAM allocation for games
+
+### 🛠️ Technical Improvements
+- **Enhanced Error Handling** - Better error management for extreme operations
+- **Improved Service Management** - More reliable service start/stop operations
+- **Registry Safety Checks** - Additional validation for registry modifications
+- **Performance Monitoring Integration** - Real-time feedback during optimizations
+
+### 📋 User Interface Updates
+- **Red Theme Integration** - Danger-themed styling for extreme optimization
+- **Enhanced Warning Labels** - Clear visual indicators for risky operations
+- **Improved Button Layout** - Better organization of optimization options
+- **Status Message Updates** - More informative feedback during operations
+
+---
+
 ## Version 2.0.2
 ### 🐛 Bug Fixes & Improvements
 - Fixed application and system tray icon loading to properly use custom icon.ico
@@ -110,27 +147,3 @@
 ---
 
 *For support and updates, visit: https://mobinmardi.github.io/*
-\`\`\`
-
-\`\`\`plaintext file="LICENSE.txt"
-MIT License
-
-Copyright (c) 2025 mDev
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.

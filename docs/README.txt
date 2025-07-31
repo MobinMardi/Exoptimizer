@@ -1,8 +1,8 @@
-Exoptimizer v2.0.2 - Advanced Gaming Optimization Tool
+Exoptimizer v2.1.2 - Advanced Gaming Optimization Tool
 =====================================================
 
 🎮 OVERVIEW:
-Exoptimizer is a comprehensive Windows gaming optimization tool designed to maximize system performance for gaming. With an intuitive modern interface, real-time monitoring, and advanced optimization features, it provides everything needed to enhance your gaming experience.
+Exoptimizer is a comprehensive Windows gaming optimization tool designed to maximize system performance for gaming. With an intuitive modern interface, real-time monitoring, advanced optimization features, and NEW EXTREME OPTIMIZATION mode for maximum FPS boost, it provides everything needed to enhance your gaming experience.
 
 📋 SYSTEM REQUIREMENTS:
 • Windows 10 version 2004 (build 19041) or later / Windows 11
@@ -20,6 +20,9 @@ Exoptimizer is a comprehensive Windows gaming optimization tool designed to maxi
 • Registry tweaks for enhanced gaming performance
 • Power management optimization (performance or battery modes)
 • Windows Defender exclusions for gaming directories
+• 🔥 NEW: EXTREME OPTIMIZATION mode for maximum FPS boost
+• 🔥 Aggressive service disabling and visual effects removal
+• 🔥 Complete Windows Defender disabling for gaming performance
 
 🎯 VALORANT Integration:
 • Process priority boosting with High/RealTime priority options
@@ -67,10 +70,11 @@ Exoptimizer is a comprehensive Windows gaming optimization tool designed to maxi
 
 🎮 RECOMMENDED WORKFLOW:
 1. Create a system restore point in "System Restore" tab
-2. Apply system optimizations in "System Optimization" tab
-3. Enable VALORANT priority in "VALORANT Priority" tab when gaming
-4. Monitor system performance in "System Monitor" tab
-5. Use performance tools for additional system management
+2. Apply regular system optimizations in "System Optimization" tab
+3. 🔥 NEW: Use "Extreme Optimization" for maximum FPS boost (advanced users)
+4. Enable VALORANT priority in "VALORANT Priority" tab when gaming
+5. Monitor system performance in "System Monitor" tab
+6. Use performance tools for additional system management
 
 🔍 TROUBLESHOOTING:
 • If optimizations don't apply: Ensure running as Administrator
@@ -80,11 +84,11 @@ Exoptimizer is a comprehensive Windows gaming optimization tool designed to maxi
 • If settings don't save: Verify write permissions in application directory
 
 💡 PRO TIPS:
-• Enable dark mode for better gaming ambiance and reduced eye strain
-• Use system tray mode to keep monitoring active without desktop clutter
-• Run Deep Cleanup weekly for optimal system performance
-• Monitor network latency during gaming sessions for connection quality
-• Create multiple restore points for different optimization configurations
+• Use Extreme Optimization only when gaming for maximum FPS
+• Regular optimization is sufficient for most users
+• Extreme mode is recommended for competitive VALORANT players
+• Always create restore points before using extreme optimizations
+• Monitor system stability after applying extreme settings
 
 🔒 SECURITY & PRIVACY:
 • No data collection or telemetry - your privacy is protected
@@ -97,7 +101,7 @@ Exoptimizer is a comprehensive Windows gaming optimization tool designed to maxi
 • For technical issues: Check Windows Event Viewer for detailed error logs
 • Before contacting support: Try "Reset to Defaults" in Settings
 
-Version: 2.0.2
+Version: 2.1.2
 Developer: mDev (Mobin Mardi)
 Copyright © 2025 - Licensed under MIT License
 Built with .NET 6.0 for Windows 10/11

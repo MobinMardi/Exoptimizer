@@ -1,6 +1,6 @@
-; Exoptimizer v2.0.2 Installer Script
+; Exoptimizer v2.1.2 Installer Script
 #define MyAppName "Exoptimizer - Gaming Optimization Tool"
-#define MyAppVersion "2.0.2"
+#define MyAppVersion "2.1.2"
 #define MyAppPublisher "mDev (Mobin Mardi)"
 #define MyAppURL "https://mobinmardi.github.io/"
 #define MyAppExeName "Exoptimizer.exe"
@@ -26,7 +26,7 @@ AllowNoIcons=yes
 LicenseFile=..\LICENSE.txt
 InfoBeforeFile=..\docs\README.txt
 OutputDir=output
-OutputBaseFilename=Exoptimizer-v2.0.2
+OutputBaseFilename=Exoptimizer-v2.1.2
 SetupIconFile=..\assets\icon.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 
@@ -46,12 +46,12 @@ UninstallDisplayName={#MyAppName} v{#MyAppVersion}
 UninstallFilesDir={app}\uninstall
 
 ; Version Info
-VersionInfoVersion=2.0.2
+VersionInfoVersion=2.1.2
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoDescription={#MyAppName} Setup
 VersionInfoCopyright=Copyright © 2025 mDev (Mobin Mardi)
 VersionInfoProductName={#MyAppName}
-VersionInfoProductVersion=2.0.2
+VersionInfoProductVersion=2.1.2
 
 ; Upgrade Settings
 AppMutex=ExoptimizerAppMutex
@@ -98,7 +98,7 @@ Name: "{userstartup}\Exoptimizer"; Filename: "{app}\{#MyAppExeName}"; Tasks: run
 [Registry]
 ; Add to Windows Programs list
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "DisplayName"; ValueData: "{#MyAppName} v{#MyAppVersion}"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "DisplayVersion"; ValueData: "2.0.2"
+Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "DisplayVersion"; ValueData: "2.1.2"
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "Publisher"; ValueData: "{#MyAppPublisher}"
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "UninstallString"; ValueData: "{uninstallexe}"
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "InstallLocation"; ValueData: "{app}"
@@ -125,7 +125,7 @@ Type: dirifempty; Name: "{app}"
 [Messages]
 ; Custom messages
 WelcomeLabel2=This will install [name/ver] on your computer.%n%nThis application requires Administrator privileges and is designed for Windows gaming optimization.%n%nIt is recommended that you close all other applications before continuing.
-FinishedLabelNoIcons=Setup has finished installing [name] on your computer.%n%nIMPORTANT: Always run Exoptimizer as Administrator for proper functionality.
+FinishedLabelNoIcons=Setup has finished installing [name] on your computer.%n%nIMPORTANT: Always run Exoptimizer as Administrator for proper functionality.%n%nNEW in v2.1.2: Extreme Optimization mode for maximum FPS boost!
 
 [Code]
 var
@@ -188,7 +188,7 @@ begin
       WizardForm.ProgressGauge.Style := npbstMarquee;
       
       try
-        RestorePointDescription := 'Before Exoptimizer v2.0.2 Installation';
+        RestorePointDescription := 'Before Exoptimizer v2.1.2 Installation';
         
         // Create restore point using PowerShell
         if Exec('powershell.exe',
@@ -213,10 +213,11 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then begin
-    MsgBox('Exoptimizer v2.0.2 has been installed successfully!' + #13#10 + #13#10 +
+    MsgBox('Exoptimizer v2.1.2 has been installed successfully!' + #13#10 + #13#10 +
            'IMPORTANT REMINDERS:' + #13#10 +
            '• Always run Exoptimizer as Administrator' + #13#10 +
            '• Create a restore point before optimization' + #13#10 +
+           '• Try the new EXTREME OPTIMIZATION for maximum FPS' + #13#10 +
            '• Restart your computer after applying optimizations' + #13#10 +
            '• Use the "Undo Optimizations" feature if needed' + #13#10 + #13#10 +
            'Thank you for using Exoptimizer!',
