@@ -1,5 +1,10 @@
 # Exoptimizer Changelog
 
+## Version 2.1.3
+### 📋 Icon Change
+- **App Icon Updated** - New Exoptimizer App Icon
+
+
 ## Version 2.1.2
 ### 🔥 NEW FEATURE: Extreme Optimization Mode
 - **Extreme Optimization Button** - New red-themed button for maximum FPS boost

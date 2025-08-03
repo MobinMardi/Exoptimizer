@@ -1,6 +1,6 @@
-; Exoptimizer v2.1.2 Installer Script
+; Exoptimizer v2.1.3 Installer Script
 #define MyAppName "Exoptimizer - Gaming Optimization Tool"
-#define MyAppVersion "2.1.2"
+#define MyAppVersion "2.1.3"
 #define MyAppPublisher "mDev (Mobin Mardi)"
 #define MyAppURL "https://mobinmardi.github.io/"
 #define MyAppExeName "Exoptimizer.exe"
@@ -26,8 +26,8 @@ AllowNoIcons=yes
 LicenseFile=..\LICENSE.txt
 InfoBeforeFile=..\docs\README.txt
 OutputDir=output
-OutputBaseFilename=Exoptimizer-v2.1.2
-SetupIconFile=..\assets\icon.ico
+OutputBaseFilename=Exoptimizer-v2.1.3
+SetupIconFile=..\assets\icon-new.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 
 ; Compression & Style
@@ -46,12 +46,12 @@ UninstallDisplayName={#MyAppName} v{#MyAppVersion}
 UninstallFilesDir={app}\uninstall
 
 ; Version Info
-VersionInfoVersion=2.1.2
+VersionInfoVersion=2.1.3
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoDescription={#MyAppName} Setup
 VersionInfoCopyright=Copyright © 2025 mDev (Mobin Mardi)
 VersionInfoProductName={#MyAppName}
-VersionInfoProductVersion=2.1.2
+VersionInfoProductVersion=2.1.3
 
 ; Upgrade Settings
 AppMutex=ExoptimizerAppMutex
@@ -78,16 +78,16 @@ Source: "..\LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion replacesamevers
 Source: "..\docs\README.txt"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 
 ; Icon
-Source: "..\assets\icon.ico"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "..\assets\icon-new.ico"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 
 [Icons]
 ; Start Menu
-Name: "{group}\Exoptimizer"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\icon.ico"; Comment: "Advanced Windows Gaming Optimizer"
+Name: "{group}\Exoptimizer"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\icon-new.ico"; Comment: "Advanced Windows Gaming Optimizer"
 Name: "{group}\{cm:UninstallProgram,Exoptimizer}"; Filename: "{uninstallexe}"; Comment: "Uninstall Exoptimizer"
 Name: "{group}\User Guide"; Filename: "{app}\README.txt"; Comment: "Read the user guide"
 
 ; Desktop Icon (optional)
-Name: "{autodesktop}\Exoptimizer"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\icon.ico"; Tasks: desktopicon; Comment: "Advanced Windows Gaming Optimizer"
+Name: "{autodesktop}\Exoptimizer"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\icon-new.ico"; Tasks: desktopicon; Comment: "Advanced Windows Gaming Optimizer"
 
 ; Quick Launch (optional)
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\Exoptimizer"; Filename: "{app}\{#MyAppExeName}"; Tasks: quicklaunchicon
@@ -98,7 +98,7 @@ Name: "{userstartup}\Exoptimizer"; Filename: "{app}\{#MyAppExeName}"; Tasks: run
 [Registry]
 ; Add to Windows Programs list
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "DisplayName"; ValueData: "{#MyAppName} v{#MyAppVersion}"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "DisplayVersion"; ValueData: "2.1.2"
+Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "DisplayVersion"; ValueData: "2.1.3"
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "Publisher"; ValueData: "{#MyAppPublisher}"
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "UninstallString"; ValueData: "{uninstallexe}"
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "InstallLocation"; ValueData: "{app}"
@@ -125,7 +125,7 @@ Type: dirifempty; Name: "{app}"
 [Messages]
 ; Custom messages
 WelcomeLabel2=This will install [name/ver] on your computer.%n%nThis application requires Administrator privileges and is designed for Windows gaming optimization.%n%nIt is recommended that you close all other applications before continuing.
-FinishedLabelNoIcons=Setup has finished installing [name] on your computer.%n%nIMPORTANT: Always run Exoptimizer as Administrator for proper functionality.%n%nNEW in v2.1.2: Extreme Optimization mode for maximum FPS boost!
+FinishedLabelNoIcons=Setup has finished installing [name] on your computer.%n%nIMPORTANT: Always run Exoptimizer as Administrator for proper functionality.%n%nNEW in v2.1.3: Extreme Optimization mode for maximum FPS boost!
 
 [Code]
 var
@@ -188,7 +188,7 @@ begin
       WizardForm.ProgressGauge.Style := npbstMarquee;
       
       try
-        RestorePointDescription := 'Before Exoptimizer v2.1.2 Installation';
+        RestorePointDescription := 'Before Exoptimizer v2.1.3 Installation';
         
         // Create restore point using PowerShell
         if Exec('powershell.exe',
@@ -213,7 +213,7 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then begin
-    MsgBox('Exoptimizer v2.1.2 has been installed successfully!' + #13#10 + #13#10 +
+    MsgBox('Exoptimizer v2.1.3 has been installed successfully!' + #13#10 + #13#10 +
            'IMPORTANT REMINDERS:' + #13#10 +
            '• Always run Exoptimizer as Administrator' + #13#10 +
            '• Create a restore point before optimization' + #13#10 +

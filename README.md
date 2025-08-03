@@ -1,6 +1,6 @@
 <div align="center">
-  <a href="assets/icon.ico" target="_blank">
-    <img width="180" src="assets/icon.ico" alt="Exoptimizer">
+  <a href="icon.ico" target="_blank">
+    <img width="180" src="icon.ico" alt="Exoptimizer">
   </a>
 </div>
 
@@ -103,12 +103,12 @@
 
 ## 🔧 Building from Source
 
-```bash
+\`\`\`bash
 git clone https://github.com/MobinMardi/Exoptimizer.git
 cd Exoptimizer
 dotnet restore
 dotnet build --configuration Release
-```
+\`\`\`
 
 ### Development Requirements
 - Visual Studio 2022 or Visual Studio Code
@@ -183,4 +183,4 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 
 ⭐ **Star this repository if you find it helpful!**
 
-**Copyright**: © 2025 mDev (Mobin Mardi) - Licensed under MIT License
+**Version**: 2.1.2 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2025 - Licensed under MIT License

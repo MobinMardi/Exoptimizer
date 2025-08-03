@@ -24,7 +24,7 @@ namespace Exoptimizer
             // Set application icon
             try
             {
-                string iconPath = System.IO.Path.Combine(Application.StartupPath, "icon.ico");
+                string iconPath = System.IO.Path.Combine(Application.StartupPath, "icon-new.ico");
                 if (System.IO.File.Exists(iconPath))
                 {
                     this.Icon = new Icon(iconPath);
@@ -32,7 +32,7 @@ namespace Exoptimizer
                 else
                 {
                     // Try alternative path
-                    iconPath = System.IO.Path.Combine(Application.StartupPath, "..", "assets", "icon.ico");
+                    iconPath = System.IO.Path.Combine(Application.StartupPath, "..", "assets", "icon-new.ico");
                     if (System.IO.File.Exists(iconPath))
                     {
                         this.Icon = new Icon(iconPath);

@@ -243,7 +243,7 @@ namespace Exoptimizer
             // Set application icon - updated path for new structure
             try
             {
-                string iconPath = Path.Combine(Application.StartupPath, "icon.ico");
+                string iconPath = Path.Combine(Application.StartupPath, "icon-new.ico");
                 if (File.Exists(iconPath))
                 {
                     this.Icon = new Icon(iconPath);
@@ -251,7 +251,7 @@ namespace Exoptimizer
                 else
                 {
                     // Try alternative path
-                    iconPath = Path.Combine(Application.StartupPath, "..", "assets", "icon.ico");
+                    iconPath = Path.Combine(Application.StartupPath, "..", "assets", "icon-new.ico");
                     if (File.Exists(iconPath))
                     {
                         this.Icon = new Icon(iconPath);
@@ -261,7 +261,7 @@ namespace Exoptimizer
             catch { }
             
             // Form properties - Modern styling with fixed size (increased width)
-            this.Text = "   Exoptimizer";
+            this.Text = "Exoptimizer";
             this.Size = new Size(1200, 700); // Increased width to 1200
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -1249,7 +1249,7 @@ namespace Exoptimizer
 
             var versionInfo = new Label
             {
-                Text = "Version: 2.1.2" + Environment.NewLine + "mDev (Mobin Mardi)" + Environment.NewLine + "Copyright © 2025",
+                Text = "Version: 2.1.3" + Environment.NewLine + "mDev (Mobin Mardi)" + Environment.NewLine + "Copyright © 2025",
                 Location = new Point(0, 210),
                 Size = new Size(300, 75),
                 ForeColor = TextSecondary,
@@ -1787,7 +1787,7 @@ namespace Exoptimizer
             try
             {
                 // Use the main application icon for system tray
-                string iconPath = Path.Combine(Application.StartupPath, "icon.ico");
+                string iconPath = Path.Combine(Application.StartupPath, "icon-new.ico");
                 if (File.Exists(iconPath))
                 {
                     notifyIcon.Icon = new Icon(iconPath);
@@ -1795,7 +1795,7 @@ namespace Exoptimizer
                 else
                 {
                     // Try alternative path
-                    iconPath = Path.Combine(Application.StartupPath, "..", "assets", "icon.ico");
+                    iconPath = Path.Combine(Application.StartupPath, "..", "assets", "icon-new.ico");
                     if (File.Exists(iconPath))
                     {
                         notifyIcon.Icon = new Icon(iconPath);
@@ -2793,7 +2793,7 @@ namespace Exoptimizer
                 var psi = new ProcessStartInfo
                 {
                     FileName = "powershell.exe",
-                    Arguments = "-Command \"Checkpoint-Computer -Description 'Exoptimizer v2.1.2 Backup' -RestorePointType 'MODIFY_SETTINGS'\"",
+                    Arguments = "-Command \"Checkpoint-Computer -Description 'Exoptimizer v2.1.3 Backup' -RestorePointType 'MODIFY_SETTINGS'\"",
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
