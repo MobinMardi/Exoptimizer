@@ -1,6 +1,6 @@
 <div align="center">
-  <a href="icon.ico" target="_blank">
-    <img width="180" src="icon.ico" alt="Exoptimizer">
+  <a href="\assets\icon-new.ico" target="_blank">
+    <img width="180" src="\assets\icon-new.ico" alt="Exoptimizer">
   </a>
 </div>
 
@@ -8,7 +8,7 @@
 
 <div align="center">
 
-  [![Version](https://img.shields.io/badge/version-2.1.2-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
+  [![Version](https://img.shields.io/badge/version-2.1.3-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
   [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
   [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey.svg)]()
   [![.NET](https://img.shields.io/badge/.NET-6.0-purple.svg)]()
