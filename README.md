@@ -15,7 +15,7 @@
 
 </div>
 
-**Exoptimizer** is a comprehensive Windows gaming optimization tool designed to maximize system performance for gaming. With an intuitive modern interface, real-time monitoring, advanced optimization features, and **NEW EXTREME OPTIMIZATION** mode for maximum FPS boost, it provides everything needed to enhance your gaming experience.
+**Exoptimizer** is a comprehensive Windows gaming optimization tool designed to maximize system performance for gaming. With an intuitive modern interface, real-time monitoring, advanced optimization features, and Extreme Optimization mode for maximum FPS boost, it provides everything needed to enhance your gaming experience.
 
 ## ✨ Features
 
@@ -25,7 +25,7 @@
 - **Registry Tweaks**: Enhanced gaming performance through system-level optimizations
 - **Power Management**: Performance or battery optimization modes
 - **Windows Defender Exclusions**: Gaming directory protection from real-time scanning
-- **🔥 NEW: Extreme Optimization**: Maximum FPS boost with aggressive system tweaks
+- **Extreme Optimization**: Maximum FPS boost with aggressive system tweaks
 - **Quick Boost**: Fast performance enhancement for immediate gaming sessions
 
 ### 🎯 VALORANT Integration
@@ -82,7 +82,7 @@
 ### 🎮 Recommended Workflow
 1. **Create System Restore Point** in "System Restore" tab
 2. **Apply Regular Optimizations** in "System Optimization" tab
-3. **🔥 Use Extreme Optimization** for maximum FPS boost (advanced users only)
+3. **Use Extreme Optimization** for maximum FPS boost (advanced users only)
 4. **Enable VALORANT Priority** in "VALORANT Priority" tab when gaming
 5. **Monitor System Performance** in "System Monitor" tab
 6. **Use Performance Tools** for additional system management
@@ -90,7 +90,7 @@
 ### 🔧 Optimization Modes
 - **Optimize System**: Standard gaming optimizations for most users
 - **Quick Boost**: Fast performance enhancement for immediate gaming
-- **🔥 Extreme Optimization**: Maximum FPS boost with aggressive tweaks (advanced users)
+- **Extreme Optimization**: Maximum FPS boost with aggressive tweaks (advanced users)
 - **Longer Battery**: Power-saving optimizations for laptop gaming
 
 ### ⚠️ Important Safety Notes
@@ -103,12 +103,12 @@
 
 ## 🔧 Building from Source
 
-\`\`\`bash
+```bash
 git clone https://github.com/MobinMardi/Exoptimizer.git
 cd Exoptimizer
 dotnet restore
 dotnet build --configuration Release
-\`\`\`
+```
 
 ### Development Requirements
 - Visual Studio 2022 or Visual Studio Code
@@ -183,4 +183,4 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 
 ⭐ **Star this repository if you find it helpful!**
 
-**Version**: 2.1.2 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2025 - Licensed under MIT License
+**Version**: 2.1.3 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2025 - Licensed under MIT License
