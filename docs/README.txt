@@ -1,4 +1,4 @@
-Exoptimizer v2.1.3 - Advanced Gaming Optimization Tool
+Exoptimizer v3.0.0 - Advanced Gaming Optimization Tool
 =====================================================
 
 🎮 OVERVIEW:
@@ -20,9 +20,9 @@ Exoptimizer is a comprehensive Windows gaming optimization tool designed to maxi
 • Registry tweaks for enhanced gaming performance
 • Power management optimization (performance or battery modes)
 • Windows Defender exclusions for gaming directories
-• 🔥 NEW: EXTREME OPTIMIZATION mode for maximum FPS boost
-• 🔥 Aggressive service disabling and visual effects removal
-• 🔥 Complete Windows Defender disabling for gaming performance
+• 🔥 EXTREME OPTIMIZATION mode for maximum FPS boost
+• 🔥 Aggressive non-essential service tuning and visual effects removal
+• 🔥 Windows Defender real-time protection toggle (safe, fully reversible)
 
 🎯 VALORANT Integration:
 • Process priority boosting with High/RealTime priority options
@@ -43,9 +43,15 @@ Exoptimizer is a comprehensive Windows gaming optimization tool designed to maxi
 • Registry Editor and Services management shortcuts
 
 💾 System Safety:
+• System Restore, networking, and firewall services are never disabled by
+  any optimization mode, at any setting - see "What does Exoptimizer never
+  touch?" in the System Restore tab for the full protected list
 • Automatic system restore point creation before changes
 • One-click system restore access for quick recovery
-• Comprehensive optimization rollback with "Undo Optimizations"
+• Comprehensive optimization rollback with "Undo Optimizations" that restores
+  every changed service to its exact original state
+• "Repair Critical Services" one-click fix for machines upgraded from an
+  older Exoptimizer version
 • Safe optimization detection to prevent duplicate applications
 
 ⚙️ Advanced Settings:
@@ -101,7 +107,7 @@ Exoptimizer is a comprehensive Windows gaming optimization tool designed to maxi
 • For technical issues: Check Windows Event Viewer for detailed error logs
 • Before contacting support: Try "Reset to Defaults" in Settings
 
-Version: 2.1.3
+Version: 3.0.0
 Developer: mDev (Mobin Mardi)
 Copyright © 2025 - Licensed under MIT License
 Built with .NET 6.0 for Windows 10/11

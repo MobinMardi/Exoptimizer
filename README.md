@@ -8,7 +8,7 @@
 
 <div align="center">
 
-  [![Version](https://img.shields.io/badge/version-2.1.3-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
+  [![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
   [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
   [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey.svg)]()
   [![.NET](https://img.shields.io/badge/.NET-6.0-purple.svg)]()
@@ -47,9 +47,11 @@
 - **Services Management**: Advanced Windows service control
 
 ### 💾 System Safety
-- **Automatic Restore Points**: System backup before applying optimizations
+- **Protected Services**: System Restore, networking, and firewall services can never be disabled by any optimization mode - see [CHANGELOG](docs/CHANGELOG.md#version-300) for the full list
+- **Automatic Restore Points**: System backup before applying optimizations, with reliability fixes so creation doesn't silently fail
 - **One-click System Restore**: Quick recovery access for system issues
-- **Comprehensive Rollback**: "Undo Optimizations" with full reversal capability
+- **Comprehensive Rollback**: "Undo Optimizations" restores every changed service to its exact original state, not a hardcoded guess
+- **Repair Critical Services**: One-click fix for machines upgraded from an older Exoptimizer version
 - **Safe Optimization Detection**: Prevents duplicate optimization applications
 - **Extreme Optimization Detection**: Smart detection of already applied extreme tweaks
 
@@ -183,4 +185,4 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 
 ⭐ **Star this repository if you find it helpful!**
 
-**Version**: 2.1.3 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2025 - Licensed under MIT License
+**Version**: 3.0.0 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2026 - Licensed under MIT License

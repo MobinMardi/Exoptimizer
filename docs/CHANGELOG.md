@@ -1,5 +1,24 @@
 # Exoptimizer Changelog
 
+## Version 3.0.0
+### 🛡️ Critical Safety Fixes
+This release fixes the root cause of the most common issues reported against 2.1.x: **restore points failing to create or apply, System Restore no longer working, and the network adapter/service failing to start after optimizing.** All of it traced back to the same mistake - several optimization presets were setting critical Windows services (System Restore's VSS/swprv, and the network stack's nsi/NlaSvc/iphlpsvc/RasMan) to "Disabled" instead of "Manual", which stops Windows itself from ever starting them again.
+
+- **Protected services list** - System Restore, core networking, and firewall/security services can no longer be disabled by *any* optimization mode, at any setting. See Settings > System Restore > "What does Exoptimizer never touch?" for the full list.
+- **"Manual" instead of "Disabled"** - every other service Exoptimizer adjusts is now set to start on demand rather than disabled outright, so Windows (or anything that depends on it) can still start it if it's genuinely needed.
+- **Accurate Undo** - "Undo Optimizations" now restores every service Exoptimizer has ever changed back to its actual original start type, instead of a hardcoded list of 6 services that left most changes in place.
+- **Reliable restore points** - restore point creation now also enables System Protection if it's off and clears Windows' 24-hour throttle on new restore points, both of which could silently cause "Create Restore Point" to do nothing.
+- **New: Repair Critical Services** - a one-click tool (System Restore tab) for machines that already have services stuck disabled from an older Exoptimizer version.
+- **Windows Defender handling simplified** - "Extreme Optimization" no longer disables the Defender driver services (WinDefend/WdBoot/WdFilter) directly; it uses only the standard, fully-reversible Group Policy registry setting, the same one IT admins use.
+- **Network tuning cleaned up** - removed several TCP tweaks that were either removed from Windows years ago (silently doing nothing) or actively hurt throughput on modern hardware, and removed the blind per-adapter MTU override that could break VPN/PPPoE connections.
+
+### 🎨 UI/UX Improvements
+- Long-running operations (Optimize, Extreme Optimize, Undo, Repair) now show a live progress dialog instead of freezing the window with no feedback.
+- Optimization and Extreme Optimization now share one confirmation flow and one results dialog instead of two overlapping dialogs.
+- Added a "what's protected" banner on the System Optimization tab and a full protected-services list under System Restore.
+- Completion dialogs now report whether a restore point actually succeeded, instead of assuming it did.
+- Minor copy fixes (e.g. "Battery" typo) and clearer checkbox/warning wording.
+
 ## Version 2.1.3
 ### 📋 Icon Change
 - **App Icon Updated** - New Exoptimizer App Icon

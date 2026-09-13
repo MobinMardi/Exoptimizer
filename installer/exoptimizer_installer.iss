@@ -1,6 +1,6 @@
-; Exoptimizer v2.1.3 Installer Script
+; Exoptimizer v3.0.0 Installer Script
 #define MyAppName "Exoptimizer - Gaming Optimization Tool"
-#define MyAppVersion "2.1.3"
+#define MyAppVersion "3.0.0"
 #define MyAppPublisher "mDev (Mobin Mardi)"
 #define MyAppURL "https://mobinmardi.github.io/"
 #define MyAppExeName "Exoptimizer.exe"
@@ -17,7 +17,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-AppCopyright=Copyright © 2025 mDev (Mobin Mardi)
+AppCopyright=Copyright © 2026 mDev (Mobin Mardi)
 
 ; Installation Settings
 DefaultDirName={autopf}\Exoptimizer
@@ -26,7 +26,7 @@ AllowNoIcons=yes
 LicenseFile=..\LICENSE.txt
 InfoBeforeFile=..\docs\README.txt
 OutputDir=output
-OutputBaseFilename=Exoptimizer-v2.1.3
+OutputBaseFilename=Exoptimizer-v3.0.0
 SetupIconFile=..\assets\icon-new.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 
@@ -46,12 +46,12 @@ UninstallDisplayName={#MyAppName} v{#MyAppVersion}
 UninstallFilesDir={app}\uninstall
 
 ; Version Info
-VersionInfoVersion=2.1.3
+VersionInfoVersion=3.0.0
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoDescription={#MyAppName} Setup
-VersionInfoCopyright=Copyright © 2025 mDev (Mobin Mardi)
+VersionInfoCopyright=Copyright © 2026 mDev (Mobin Mardi)
 VersionInfoProductName={#MyAppName}
-VersionInfoProductVersion=2.1.3
+VersionInfoProductVersion=3.0.0
 
 ; Upgrade Settings
 AppMutex=ExoptimizerAppMutex
@@ -70,15 +70,15 @@ Name: "createrestorepoint"; Description: "Create system restore point before ins
 
 [Files]
 ; Main Application Files
-Source: "..\src\bin\Release\net6.0-windows\win-x64\publish\Exoptimizer.exe"; DestDir: "{app}"; DestName: "{#MyAppExeName}"; Flags: ignoreversion replacesameversion
-Source: "..\src\bin\Release\net6.0-windows\win-x64\publish\*"; DestDir: "{app}"; Excludes: "Exoptimizer.exe"; Flags: ignoreversion replacesameversion recursesubdirs createallsubdirs
+Source: "..\src\bin\Release\net6.0-windows\win-x64\publish\Exoptimizer.exe"; DestDir: "{app}"; DestName: "{#MyAppExeName}"; Flags: ignoreversion
+Source: "..\src\bin\Release\net6.0-windows\win-x64\publish\*"; DestDir: "{app}"; Excludes: "Exoptimizer.exe"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; Documentation
-Source: "..\LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
-Source: "..\docs\README.txt"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "..\LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\docs\README.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Icon
-Source: "..\assets\icon-new.ico"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "..\assets\icon-new.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 ; Start Menu
@@ -98,7 +98,7 @@ Name: "{userstartup}\Exoptimizer"; Filename: "{app}\{#MyAppExeName}"; Tasks: run
 [Registry]
 ; Add to Windows Programs list
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "DisplayName"; ValueData: "{#MyAppName} v{#MyAppVersion}"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "DisplayVersion"; ValueData: "2.1.3"
+Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "DisplayVersion"; ValueData: "3.0.0"
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "Publisher"; ValueData: "{#MyAppPublisher}"
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "UninstallString"; ValueData: "{uninstallexe}"
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}"; ValueType: string; ValueName: "InstallLocation"; ValueData: "{app}"
@@ -120,12 +120,13 @@ Filename: "{cmd}"; Parameters: "/c taskkill /f /im ""Exoptimizer.exe"" >nul 2>&1
 Type: files; Name: "{app}\*.log"
 Type: files; Name: "{app}\*.tmp"
 Type: files; Name: "{app}\exoptimizer_settings.json"; Check: not IsUpgrade
+Type: files; Name: "{app}\exoptimizer_service_state.json"; Check: not IsUpgrade
 Type: dirifempty; Name: "{app}"
 
 [Messages]
 ; Custom messages
 WelcomeLabel2=This will install [name/ver] on your computer.%n%nThis application requires Administrator privileges and is designed for Windows gaming optimization.%n%nIt is recommended that you close all other applications before continuing.
-FinishedLabelNoIcons=Setup has finished installing [name] on your computer.%n%nIMPORTANT: Always run Exoptimizer as Administrator for proper functionality.%n%nNEW in v2.1.3: Extreme Optimization mode for maximum FPS boost!
+FinishedLabelNoIcons=Setup has finished installing [name] on your computer.%n%nIMPORTANT: Always run Exoptimizer as Administrator for proper functionality.%n%nNEW in v3.0.0: System Restore, your network, and your firewall are now permanently protected from every optimization mode - see the changelog for details.
 
 [Code]
 var
@@ -188,7 +189,7 @@ begin
       WizardForm.ProgressGauge.Style := npbstMarquee;
       
       try
-        RestorePointDescription := 'Before Exoptimizer v2.1.3 Installation';
+        RestorePointDescription := 'Before Exoptimizer v3.0.0 Installation';
         
         // Create restore point using PowerShell
         if Exec('powershell.exe',
@@ -213,7 +214,7 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then begin
-    MsgBox('Exoptimizer v2.1.3 has been installed successfully!' + #13#10 + #13#10 +
+    MsgBox('Exoptimizer v3.0.0 has been installed successfully!' + #13#10 + #13#10 +
            'IMPORTANT REMINDERS:' + #13#10 +
            '• Always run Exoptimizer as Administrator' + #13#10 +
            '• Create a restore point before optimization' + #13#10 +

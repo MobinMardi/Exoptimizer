@@ -22,6 +22,8 @@ namespace Exoptimizer
 
     public partial class MainForm : Form
     {
+        public const string AppVersion = "3.0.0";
+
         private bool isOptimized = false;
         private bool valorantPriorityActive = false;
         private bool systemTrayEnabled = false;
@@ -455,42 +457,53 @@ namespace Exoptimizer
             };
 
             // Card container
-            var optimizationCard = CreateCard(new Point(40, 140), new Size(900, 300)); // Added 40px margin from left
+            var optimizationCard = CreateCard(new Point(40, 140), new Size(900, 320)); // Added 40px margin from left
 
             // Check current optimization status
             CheckOptimizationStatus();
             CheckExtremeOptimizationStatus(); // Add this new check
 
+            // Reassurance banner - directly addresses the class of bug fixed in 3.0.0
+            var safetyBanner = new Label
+            {
+                Text = "🛡️ System Restore, your network connection, and your firewall are never disabled by Exoptimizer - ever, at any setting.",
+                Location = new Point(0, 0),
+                Size = new Size(880, 20),
+                ForeColor = SuccessColor,
+                Font = new Font("Segoe UI", 8.5F, FontStyle.Bold),
+                BackColor = Color.Transparent
+            };
+
             // Buttons in horizontal layout: Optimize System, Quick Boost, Extreme Optimization, Longer Battery
             optimizeButton = CreateModernButton(
                 isOptimized ? "✓ System Optimized" : "Optimize System", 
                 isOptimized ? SuccessColor : PrimaryColor, 
-                new Point(0, 20), 
+                new Point(0, 40), 
                 new Size(140, 40)
             );
             optimizeButton.Click += OptimizeButton_Click;
             if (isOptimized) optimizeButton.Enabled = false;
 
-            var quickButton = CreateModernButton("Quick Boost", SuccessColor, new Point(150, 20), new Size(120, 40));
+            var quickButton = CreateModernButton("Quick Boost", SuccessColor, new Point(150, 40), new Size(120, 40));
             quickButton.Click += (s, e) => MessageBox.Show("Quick optimization applied!", "Exoptimizer", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             var extremeOptimizeButton = CreateModernButton(
                 isExtremeOptimized ? "✓ Extreme Applied" : "Extreme Optimization", 
                 isExtremeOptimized ? SuccessColor : DangerColor, // Red theme when not applied, green when applied
-                new Point(280, 20), // Position after Quick Boost
+                new Point(280, 40), // Position after Quick Boost
                 new Size(160, 40)
             );
             extremeOptimizeButton.Click += ExtremeOptimizeButton_Click;
             if (isExtremeOptimized) extremeOptimizeButton.Enabled = false;
 
-            var batteryButton = CreateModernButton("Longer Battery", Color.FromArgb(168, 85, 247), new Point(450, 20), new Size(130, 40));
+            var batteryButton = CreateModernButton("Longer Battery", Color.FromArgb(168, 85, 247), new Point(450, 40), new Size(130, 40));
             batteryButton.Click += BatteryOptimizeButton_Click;
 
             // Add warning text for extreme optimization below the buttons
             var extremeWarningLabel = new Label
             {
-                Text = "Extreme Optimization: \n⚠️ WARNING: Extreme mode disables many Windows features for maximum FPS. Use with caution!",
-                Location = new Point(0, 120), // Position under extreme button
+                Text = "Extreme Optimization:\n⚠️ Disables many non-essential Windows features for maximum FPS. A restore point is created first - use with caution.",
+                Location = new Point(0, 140), // Position under extreme button
                 Size = new Size(350, 50),
                 ForeColor = DangerColor,
                 Font = new Font("Segoe UI", 8F, FontStyle.Italic),
@@ -500,8 +513,8 @@ namespace Exoptimizer
             // Battery description
             var batteryDescLabel = new Label
             {
-                Text = "Longer Batery: \nOptimizes power settings for extended battery life during power outages and when unplugged from AC power source",
-                Location = new Point(0, 170), // Position under battery button
+                Text = "Longer Battery:\nOptimizes power settings for extended battery life during power outages and when unplugged from AC power source",
+                Location = new Point(0, 190), // Position under battery button
                 Size = new Size(300, 40),
                 ForeColor = Color.FromArgb(168, 85, 247),
                 Font = new Font("Segoe UI", 8F, FontStyle.Italic),
@@ -511,16 +524,16 @@ namespace Exoptimizer
             // Checkbox
             defenderCheckBox = new CheckBox
             {
-                Text = "Disable Windows Defender (Advanced)",
-                Location = new Point(0, 75),
-                Size = new Size(300, 25),
+                Text = "Disable Windows Defender real-time protection (Advanced, fully reversible)",
+                Location = new Point(0, 95),
+                Size = new Size(430, 25),
                 ForeColor = WarningColor,
                 Font = new Font("Segoe UI", 9F),
                 BackColor = Color.Transparent
             };
 
             optimizationCard.Controls.AddRange(new Control[] { 
-                optimizeButton, quickButton, extremeOptimizeButton, batteryButton, extremeWarningLabel, batteryDescLabel, defenderCheckBox
+                safetyBanner, optimizeButton, quickButton, extremeOptimizeButton, batteryButton, extremeWarningLabel, batteryDescLabel, defenderCheckBox
             });
 
             contentPanel.Controls.AddRange(new Control[] { titleLabel, descLabel, optimizationCard });
@@ -552,34 +565,13 @@ namespace Exoptimizer
         {
             try
             {
-                // Check if key services are disabled
+                // 3.0.0 sets non-essential services to "manual" (demand) rather
+                // than "disabled" - see SystemGuard - so that's what indicates
+                // the optimization has been applied.
                 string[] keyServices = { "WSearch", "SysMain", "wuauserv" };
-                int disabledCount = 0;
-                
-                foreach (string service in keyServices)
-                {
-                    var psi = new ProcessStartInfo
-                    {
-                        FileName = "sc",
-                        Arguments = $"qc \"{service}\"",
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        RedirectStandardOutput = true
-                    };
-                    
-                    using var process = Process.Start(psi);
-                    if (process != null)
-                    {
-                        process.WaitForExit();
-                        string output = process.StandardOutput.ReadToEnd();
-                        if (output.Contains("START_TYPE") && output.Contains("DISABLED"))
-                        {
-                            disabledCount++;
-                        }
-                    }
-                }
-                
-                return disabledCount >= 2; // At least 2 out of 3 key services disabled
+                int adjustedCount = keyServices.Count(service => SystemGuard.GetServiceStartType(service) == "demand");
+
+                return adjustedCount >= 2; // At least 2 out of 3 key services adjusted
             }
             catch
             {
@@ -660,34 +652,16 @@ namespace Exoptimizer
         {
             try
             {
-                // Check if key extreme services are disabled
-                string[] extremeServices = { "BITS", "EventLog", "WinDefend", "WdNisSvc", "DiagTrack" };
-                int disabledCount = 0;
-        
-                foreach (string service in extremeServices)
-                {
-                    var psi = new ProcessStartInfo
-                    {
-                        FileName = "sc",
-                        Arguments = $"qc \"{service}\"",
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        RedirectStandardOutput = true
-                    };
-        
-                    using var process = Process.Start(psi);
-                    if (process != null)
-                    {
-                        process.WaitForExit();
-                        string output = process.StandardOutput.ReadToEnd();
-                        if (output.Contains("START_TYPE") && output.Contains("DISABLED"))
-                        {
-                            disabledCount++;
-                        }
-                    }
-                }
-        
-                return disabledCount >= 3; // At least 3 out of 5 extreme services disabled
+                // These are services extreme mode still adjusts (set to
+                // "manual") in 3.0.0. EventLog/WinDefend/WdNisSvc used to be
+                // in this indicator list, but they're never touched anymore
+                // (EventLog is protected; Defender is handled purely via
+                // registry policy - see SystemGuard and
+                // DisableWindowsDefenderRealtimeProtection).
+                string[] extremeServices = { "BITS", "DiagTrack", "dmwappushservice", "WSearch", "SysMain" };
+                int adjustedCount = extremeServices.Count(service => SystemGuard.GetServiceStartType(service) == "demand");
+
+                return adjustedCount >= 3; // At least 3 out of 5 extreme-mode services adjusted
             }
             catch
             {
@@ -1095,7 +1069,7 @@ namespace Exoptimizer
             };
 
             // Card container
-            var restoreCard = CreateCard(new Point(40, 140), new Size(800, 200)); // Added 40px margin
+            var restoreCard = CreateCard(new Point(40, 140), new Size(800, 280)); // Added 40px margin
 
             // First row of buttons
             var createRestoreBtn = CreateModernButton("Create Restore Point", PrimaryColor, new Point(0, 20), new Size(150, 40));
@@ -1118,11 +1092,79 @@ namespace Exoptimizer
                 }
             };
 
+            // Separator label
+            var repairLabel = new Label
+            {
+                Text = "Upgraded from an older Exoptimizer version?",
+                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
+                ForeColor = TextPrimary,
+                Location = new Point(0, 130),
+                Size = new Size(500, 25),
+                BackColor = Color.Transparent
+            };
+
+            var repairDescLabel = new Label
+            {
+                Text = "If restore points, your network, or Windows Defender were left disabled by an older\n" +
+                       "version, this resets those specific services back to how Windows ships them.",
+                Location = new Point(0, 158),
+                Size = new Size(760, 35),
+                ForeColor = TextSecondary,
+                Font = new Font("Segoe UI", 9F),
+                BackColor = Color.Transparent
+            };
+
+            var repairBtn = CreateModernButton("Repair Critical Services", SuccessColor, new Point(0, 200), new Size(190, 40));
+            repairBtn.Click += RepairCriticalServicesButton_Click;
+
+            var protectedInfoBtn = CreateModernButton("What does Exoptimizer never touch?", SecondaryColor, new Point(200, 200), new Size(260, 40));
+            protectedInfoBtn.Click += (s, e) =>
+            {
+                string list = string.Join(Environment.NewLine, SystemGuard.ProtectedServices.OrderBy(n => n));
+                MessageBox.Show(
+                    "Exoptimizer will never disable or stop these Windows services, at any setting:" +
+                    Environment.NewLine + Environment.NewLine + list,
+                    "Protected Services", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            };
+
             restoreCard.Controls.AddRange(new Control[] { 
-                createRestoreBtn, systemRestoreBtn, undoBtn, rebootBtn 
+                createRestoreBtn, systemRestoreBtn, undoBtn, rebootBtn,
+                repairLabel, repairDescLabel, repairBtn, protectedInfoBtn
             });
 
             contentPanel.Controls.AddRange(new Control[] { titleLabel, descLabel, restoreCard });
+        }
+
+        private void RepairCriticalServicesButton_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show(
+                "Repair Critical Services?" + Environment.NewLine + Environment.NewLine +
+                "This resets System Restore, networking, and firewall/Defender-related services " +
+                "back to the start type Windows ships them with, and starts them." + Environment.NewLine + Environment.NewLine +
+                "This is safe to run even if nothing is broken.",
+                "Repair Critical Services",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
+
+            if (result != DialogResult.Yes) return;
+
+            var steps = new List<(string, Action<Action<string>>)>
+            {
+                ("Repairing critical services...", report =>
+                {
+                    SystemGuard.RepairCriticalServices((name, current, total) =>
+                        report($"Repairing {name} ({current}/{total})..."));
+                }),
+            };
+
+            RunStepsWithProgress("Repairing Critical Services", steps);
+
+            MessageBox.Show(
+                "Critical services have been reset to their Windows-default state." + Environment.NewLine + Environment.NewLine +
+                "A restart is recommended. If Windows Defender still shows as off afterwards, " +
+                "run 'sfc /scannow' from an elevated Command Prompt to repair its driver files.",
+                "Repair Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void LoadSettingsContent()
@@ -1249,7 +1291,7 @@ namespace Exoptimizer
 
             var versionInfo = new Label
             {
-                Text = "Version: 2.1.3" + Environment.NewLine + "mDev (Mobin Mardi)" + Environment.NewLine + "Copyright © 2025",
+                Text = $"Version: {AppVersion}" + Environment.NewLine + "mDev (Mobin Mardi)" + Environment.NewLine + "Copyright © 2025",
                 Location = new Point(0, 210),
                 Size = new Size(300, 75),
                 ForeColor = TextSecondary,
@@ -1665,14 +1707,9 @@ namespace Exoptimizer
                 // Apply the settings
                 RunCommand("powercfg -setactive a1841308-3541-4fab-bc81-f71556f20b4a");
 
-                // Disable Windows Search indexing
-                RunCommand("sc config \"WSearch\" start= disabled");
-
-                // Disable Windows Update service temporarily
-                RunCommand("sc config \"wuauserv\" start= disabled");
-
-                // Disable Superfetch/SysMain
-                RunCommand("sc config \"SysMain\" start= disabled");
+                // Reduce background disk/CPU activity to save power (set to
+                // manual, not disabled - see SystemGuard for why)
+                SystemGuard.DisableServicesSafely(new[] { "WSearch", "wuauserv", "SysMain" });
 
                 if (statusLabel != null)
                 {
@@ -2162,6 +2199,66 @@ namespace Exoptimizer
             }
         }
 
+        /// <summary>
+        /// Runs a sequence of named steps with a small progress dialog, so the
+        /// app never just freezes with no feedback while it works through a
+        /// batch of service/registry/network changes (the same
+        /// progress-dialog pattern the Deep Cleanup tool already uses). Each
+        /// step receives a "report" callback it can call any number of times
+        /// to show finer-grained progress (e.g. which service it's on).
+        /// </summary>
+        private void RunStepsWithProgress(string title, IReadOnlyList<(string Label, Action<Action<string>> Step)> steps)
+        {
+            using var progressForm = new Form
+            {
+                Text = title,
+                Size = new Size(440, 160),
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false,
+                ControlBox = false,
+                BackColor = CardColor
+            };
+
+            var progressLabel = new Label
+            {
+                Text = "Starting...",
+                Location = new Point(20, 20),
+                Size = new Size(390, 40),
+                ForeColor = TextPrimary,
+                Font = new Font("Segoe UI", 9F)
+            };
+
+            var progressBar = new ProgressBar
+            {
+                Location = new Point(20, 65),
+                Size = new Size(390, 20),
+                Style = ProgressBarStyle.Continuous,
+                Maximum = 100
+            };
+
+            progressForm.Controls.AddRange(new Control[] { progressLabel, progressBar });
+            progressForm.Show(this);
+
+            void Report(string text)
+            {
+                progressLabel.Text = text;
+                Application.DoEvents();
+            }
+
+            for (int i = 0; i < steps.Count; i++)
+            {
+                Report(steps[i].Label);
+                progressBar.Value = Math.Min(100, (int)((i + 1) / (double)steps.Count * 100));
+
+                try { steps[i].Step(Report); }
+                catch { /* one step failing should never abort the rest of the batch */ }
+            }
+
+            progressForm.Close();
+        }
+
         private void OptimizeButton_Click(object sender, EventArgs e)
         {
             if (isOptimized)
@@ -2184,6 +2281,31 @@ namespace Exoptimizer
             // Handle X button click (DialogResult.Cancel) - do nothing, just return
         }
 
+        /// <summary>The "regular" optimization pass, shared by both Optimize System and (as a base) Extreme Optimization, so the two never diverge or run their own separate confirmation dialogs.</summary>
+        private List<(string, Action<Action<string>>)> BuildRegularOptimizationSteps(Action<bool, string> onRestorePointResult)
+        {
+            return new List<(string, Action<Action<string>>)>
+            {
+                ("Creating a restore point...", report =>
+                {
+                    var (ok, msg) = CreateRestorePoint();
+                    onRestorePointResult(ok, msg);
+                }),
+                ("Adjusting non-essential services...", report =>
+                {
+                    DisableUnnecessaryServices(name => report($"Adjusting services ({name})..."));
+                }),
+                ("Tuning network settings...", report => OptimizeNetworkSettings()),
+                ("Applying power plan...", report => OptimizePowerSettings()),
+                ("Applying registry tweaks...", report => ApplyRegistryOptimizations()),
+                (defenderCheckBox?.Checked == true ? "Adjusting Windows Defender..." : "Adding game exclusions...", report =>
+                {
+                    if (defenderCheckBox?.Checked == true) DisableWindowsDefenderRealtimeProtection();
+                    else AddGamingExclusions();
+                }),
+            };
+        }
+
         private void ApplyOptimizations()
         {
             if (statusLabel != null)
@@ -2199,20 +2321,12 @@ namespace Exoptimizer
 
             try
             {
-                CreateRestorePoint();
-                DisableUnnecessaryServices();
-                OptimizeNetworkSettings();
-                OptimizePowerSettings();
-                ApplyRegistryOptimizations();
+                bool restorePointOk = true;
+                string restorePointMessage = string.Empty;
 
-                if (defenderCheckBox?.Checked == true)
-                {
-                    DisableWindowsDefender();
-                }
-                else
-                {
-                    AddGamingExclusions();
-                }
+                var steps = BuildRegularOptimizationSteps((ok, msg) => { restorePointOk = ok; restorePointMessage = msg; });
+
+                RunStepsWithProgress("Optimizing System", steps);
 
                 isOptimized = true;
 
@@ -2228,7 +2342,15 @@ namespace Exoptimizer
                     optimizeButton.BackColor = SuccessColor;
                 }
 
-                MessageBox.Show("Optimization completed!" + Environment.NewLine + Environment.NewLine + "Restart recommended.", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                string restoreNote = restorePointOk
+                    ? "A restore point was created before any changes were made."
+                    : $"Note: a restore point could not be created ({restorePointMessage}). Nothing critical (System Restore, networking, or your firewall) was touched regardless.";
+
+                MessageBox.Show(
+                    "Optimization completed!" + Environment.NewLine + Environment.NewLine +
+                    restoreNote + Environment.NewLine + Environment.NewLine +
+                    "Restart recommended.",
+                    "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -2258,14 +2380,16 @@ namespace Exoptimizer
             var result = MessageBox.Show(
                 "⚠️ EXTREME OPTIMIZATION WARNING ⚠️" + Environment.NewLine + Environment.NewLine +
                 "This will apply AGGRESSIVE optimizations that may:" + Environment.NewLine +
-                "• Disable many Windows features and services" + Environment.NewLine +
+                "• Disable many non-essential Windows features and services" + Environment.NewLine +
                 "• Turn off Windows visual effects completely" + Environment.NewLine +
                 "• Disable Windows Defender real-time protection" + Environment.NewLine +
                 "• Stop Windows Update and telemetry services" + Environment.NewLine +
                 "• Disable startup programs and background apps" + Environment.NewLine +
                 "• Apply extreme power and CPU settings" + Environment.NewLine + Environment.NewLine +
+                "Exoptimizer will never disable System Restore, your network, or your firewall - " +
+                "those are always left alone, no matter what." + Environment.NewLine + Environment.NewLine +
                 "⚠️ ONLY USE IF YOU UNDERSTAND THE RISKS ⚠️" + Environment.NewLine +
-                "System restore point will be created automatically." + Environment.NewLine + Environment.NewLine +
+                "A system restore point will be created automatically." + Environment.NewLine + Environment.NewLine +
                 "Continue with EXTREME optimization?",
                 "Extreme Gaming Optimization",
                 MessageBoxButtons.YesNo,
@@ -2288,21 +2412,39 @@ namespace Exoptimizer
                     statusLabel.ForeColor = DangerColor;
                 }
 
-                // Create restore point first
-                CreateRestorePoint();
+                bool restorePointOk = true;
+                string restorePointMessage = string.Empty;
 
-                // Apply regular optimizations first
-                ApplyOptimizations();
+                // Extreme mode is the regular pass plus the extra extreme
+                // steps, run as one batch with one progress dialog and one
+                // result - not two separate passes with two separate popups.
+                var steps = BuildRegularOptimizationSteps((ok, msg) => { restorePointOk = ok; restorePointMessage = msg; });
+                steps.AddRange(new List<(string, Action<Action<string>>)>
+                {
+                    ("Applying extreme service changes...", report =>
+                    {
+                        ApplyExtremeGameModeOptimizations(name => report($"Adjusting services ({name})..."));
+                    }),
+                    ("Disabling visual effects...", report => DisableWindowsVisualEffects()),
+                    ("Adjusting background apps...", report => DisableBackgroundAppsAndServices()),
+                    ("Tuning network settings (extreme)...", report => ApplyExtremeNetworkOptimizations()),
+                    ("Applying extreme registry tweaks...", report => ApplyExtremeRegistryTweaks()),
+                    ("Disabling Windows Defender real-time protection...", report => DisableWindowsDefenderRealtimeProtection()),
+                    ("Disabling startup programs...", report => DisableStartupPrograms()),
+                    ("Applying memory tweaks...", report => ApplyExtremeMemoryOptimizations()),
+                });
 
-                // Now apply extreme optimizations
-                ApplyExtremeGameModeOptimizations();
-                DisableWindowsVisualEffects();
-                DisableBackgroundAppsAndServices();
-                ApplyExtremeNetworkOptimizations();
-                ApplyExtremeRegistryTweaks();
-                DisableWindowsDefenderCompletely();
-                DisableStartupPrograms();
-                ApplyExtremeMemoryOptimizations();
+                RunStepsWithProgress("Applying Extreme Optimization", steps);
+
+                isOptimized = true;
+                isExtremeOptimized = true;
+
+                if (optimizeButton != null)
+                {
+                    optimizeButton.Text = "✓ Optimized";
+                    optimizeButton.BackColor = SuccessColor;
+                    optimizeButton.Enabled = false;
+                }
 
                 if (statusLabel != null)
                 {
@@ -2310,18 +2452,21 @@ namespace Exoptimizer
                     statusLabel.ForeColor = DangerColor;
                 }
 
+                string restoreNote = restorePointOk
+                    ? "A restore point was created before any changes were made."
+                    : $"Note: a restore point could not be created ({restorePointMessage}). System Restore, your network, and your firewall were still never touched.";
+
                 MessageBox.Show(
                     "🔥 EXTREME OPTIMIZATION COMPLETED! 🔥" + Environment.NewLine + Environment.NewLine +
                     "Your system has been optimized for maximum gaming performance." + Environment.NewLine +
-                    "Many Windows features have been disabled for FPS gains." + Environment.NewLine + Environment.NewLine +
+                    "Many non-essential Windows features have been disabled for FPS gains." + Environment.NewLine + Environment.NewLine +
+                    restoreNote + Environment.NewLine + Environment.NewLine +
                     "⚠️ RESTART YOUR COMPUTER NOW FOR CHANGES TO TAKE EFFECT ⚠️" + Environment.NewLine + Environment.NewLine +
                     "If you experience issues, use 'Undo Optimizations' or System Restore.",
                     "Extreme Optimization Complete",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning
                 );
-                
-                isExtremeOptimized = true;
 
                 // Update the extreme button if it exists
                 if (contentPanel != null)
@@ -2356,34 +2501,29 @@ namespace Exoptimizer
             }
         }
 
-        private static void ApplyExtremeGameModeOptimizations()
-        {
-            // Disable even more services for extreme performance
-            string[] extremeServices = {
-                // Additional services to disable for extreme mode
-                "BITS", "EventLog", "gpsvc", "iphlpsvc", "LanmanServer", "MMCSS",
-                "MpsSvc", "NlaSvc", "nsi", "RasMan", "Schedule", "SENS", "ShellHWDetection",
-                "Spooler", "SSDPSRV", "SstpSvc", "swprv", "TapiSrv", "TrkWks", "upnphost",
-                "VSS", "W32Time", "WbioSrvc", "wcncsvc", "WdiServiceHost", "WdiSystemHost",
-                "WebClient", "Wecsvc", "wercplsupport", "WerSvc", "WinHttpAutoProxySvc",
-                "Winmgmt", "WinRM", "WMPNetworkSvc", "WPCSvc", "WPDBusEnum", "wscsvc",
-                "WSearch", "wuauserv", "WwanSvc", "XblAuthManager", "XblGameSave", "XboxGipSvc",
-                "XboxNetApiSvc", "DiagTrack", "dmwappushservice", "lfsvc", "MapsBroker",
-                "NetTcpPortSharing", "RemoteAccess", "RemoteRegistry", "SharedAccess",
-                "SysMain", "Themes", "WbioSrvc", "WMPNetworkSvc", "WpcMonSvc", "SessionEnv",
-                "TermService", "UmRdpService", "RpcLocator", "FontCache", "stisvc", "wisvc",
-                "PcaSvc", "CscService", "defragsvc", "UsoSvc", "WaaSMedicSvc", "DoSvc"
-            };
+        // Additional non-essential services set to manual (not disabled) start
+        // for extreme mode. System Restore (VSS/swprv), the networking stack
+        // (nsi/NlaSvc/iphlpsvc/RasMan/LanmanServer/WinHttpAutoProxySvc), and
+        // core plumbing (Winmgmt/Schedule/EventLog/gpsvc/W32Time) are never
+        // included here - see SystemGuard.ProtectedServices for why.
+        private static readonly string[] ExtremeModeServices = {
+            "BITS", "MMCSS", "SENS", "ShellHWDetection",
+            "Spooler", "SSDPSRV", "SstpSvc", "TapiSrv", "TrkWks", "upnphost",
+            "WbioSrvc", "wcncsvc", "WdiServiceHost", "WdiSystemHost",
+            "WebClient", "Wecsvc", "wercplsupport", "WerSvc",
+            "WinRM", "WMPNetworkSvc", "WPCSvc", "WPDBusEnum", "wscsvc",
+            "WSearch", "wuauserv", "WwanSvc", "XblAuthManager", "XblGameSave", "XboxGipSvc",
+            "XboxNetApiSvc", "DiagTrack", "dmwappushservice", "lfsvc", "MapsBroker",
+            "NetTcpPortSharing", "RemoteAccess", "RemoteRegistry",
+            "SysMain", "Themes", "WpcMonSvc", "SessionEnv",
+            "TermService", "UmRdpService", "RpcLocator", "FontCache", "stisvc", "wisvc",
+            "PcaSvc", "CscService", "defragsvc", "UsoSvc", "WaaSMedicSvc", "DoSvc"
+        };
 
-            foreach (string service in extremeServices)
-            {
-                try
-                {
-                    RunCommand($"sc config \"{service}\" start= disabled");
-                    RunCommand($"sc stop \"{service}\"");
-                }
-                catch { }
-            }
+        private static void ApplyExtremeGameModeOptimizations(Action<string>? onServiceStep = null)
+        {
+            SystemGuard.DisableServicesSafely(ExtremeModeServices, (name, current, total) =>
+                onServiceStep?.Invoke(name));
 
             // Set extreme power settings
             RunCommand("powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"); // High Performance
@@ -2440,32 +2580,7 @@ namespace Exoptimizer
             catch { }
         }
 
-        private static void ApplyExtremeNetworkOptimizations()
-        {
-            string[] networkCommands = {
-                "netsh int tcp set global autotuninglevel=disabled",
-                "netsh int tcp set global chimney=enabled",
-                "netsh int tcp set global rss=enabled",
-                "netsh int tcp set global netdma=enabled",
-                "netsh int tcp set global dca=enabled",
-                "netsh int tcp set global rsc=disabled",
-                "netsh int tcp set heuristics disabled",
-                "netsh int tcp set global nonsackrttresiliency=disabled",
-                "netsh int tcp set supplemental internet congestionprovider=ctcp",
-                "netsh int tcp set global timestamps=disabled",
-                "netsh int tcp set global initialRto=2000",
-                "netsh int tcp set global maxsynretransmissions=2",
-                "netsh interface ipv4 set subinterface \"Local Area Connection\" mtu=1500 store=persistent",
-                "netsh interface ipv4 set subinterface \"Ethernet\" mtu=1500 store=persistent",
-                "netsh interface ipv4 set subinterface \"Wi-Fi\" mtu=1500 store=persistent"
-            };
-
-            foreach (string command in networkCommands)
-            {
-                try { RunCommand(command); }
-                catch { }
-            }
-        }
+        private static void ApplyExtremeNetworkOptimizations() => OptimizeNetworkSettings();
 
         private static void ApplyExtremeRegistryTweaks()
         {
@@ -2508,33 +2623,6 @@ namespace Exoptimizer
                     "AllowTelemetry", 0, RegistryValueKind.DWord);
                 Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection", 
                     "AllowTelemetry", 0, RegistryValueKind.DWord);
-            }
-            catch { }
-        }
-
-        private static void DisableWindowsDefenderCompletely()
-        {
-            try
-            {
-                // Disable Windows Defender completely
-                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender", 
-                    "DisableAntiSpyware", 1, RegistryValueKind.DWord);
-                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection", 
-                    "DisableRealtimeMonitoring", 1, RegistryValueKind.DWord);
-                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection", 
-                    "DisableBehaviorMonitoring", 1, RegistryValueKind.DWord);
-                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection", 
-                    "DisableOnAccessProtection", 1, RegistryValueKind.DWord);
-                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection", 
-                    "DisableScanOnRealtimeEnable", 1, RegistryValueKind.DWord);
-
-                // Disable Windows Defender services
-                RunCommand("sc config \"WinDefend\" start= disabled");
-                RunCommand("sc config \"WdNisSvc\" start= disabled");
-                RunCommand("sc config \"Sense\" start= disabled");
-                RunCommand("sc config \"WdNisDrv\" start= disabled");
-                RunCommand("sc config \"WdBoot\" start= disabled");
-                RunCommand("sc config \"WdFilter\" start= disabled");
             }
             catch { }
         }
@@ -2665,14 +2753,23 @@ namespace Exoptimizer
 
         private void RestoreButton_Click(object sender, EventArgs e)
         {
-            try
+            this.UseWaitCursor = true;
+            Application.DoEvents();
+
+            var (success, message) = CreateRestorePoint();
+
+            this.UseWaitCursor = false;
+
+            if (success)
             {
-                CreateRestorePoint();
                 MessageBox.Show("Restore point created!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Failed to create restore point: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    $"Couldn't create a restore point: {message}" + Environment.NewLine + Environment.NewLine +
+                    "You can also create one manually from Control Panel > System > System Protection.",
+                    "Restore Point", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -2696,22 +2793,32 @@ namespace Exoptimizer
         {
             try
             {
-                string[] services = { "wuauserv", "UsoSvc", "Spooler", "Themes", "WSearch", "SysMain" };
-                
-                foreach (string service in services)
+                // Restores every service Exoptimizer has ever changed back to
+                // its actual original start type (not a guessed "auto") - see
+                // SystemGuard.RestoreAllTrackedServices. This replaces the old
+                // hardcoded 6-service list, which was why "Undo" used to leave
+                // most changed services untouched.
+                var steps = new List<(string, Action<Action<string>>)>
                 {
-                    RunCommand($"sc config \"{service}\" start= auto");
-                }
+                    ("Restoring changed services...", report =>
+                    {
+                        SystemGuard.RestoreAllTrackedServices((name, current, total) =>
+                            report($"Restoring {name} ({current}/{total})..."));
+                    }),
+                    ("Resetting network settings...", report =>
+                    {
+                        RunCommand("netsh int tcp reset");
+                        RunCommand("netsh winsock reset");
+                    }),
+                    ("Resetting power plan...", report =>
+                    {
+                        RunCommand("powercfg -setactive 381b4222-f694-41f0-9685-ff5bb260df2e"); // Balanced
+                    }),
+                    ("Reverting extreme mode tweaks...", report => UndoExtremeOptimizations()),
+                };
 
-                RunCommand("netsh int tcp reset");
-                RunCommand("netsh winsock reset");
+                RunStepsWithProgress("Undoing Optimizations", steps);
 
-                // Reset power plan to Balanced
-                RunCommand("powercfg -setactive 381b4222-f694-41f0-9685-ff5bb260df2e");
-
-                // Add this line to undo extreme optimizations as well
-                UndoExtremeOptimizations();
-                
                 isOptimized = false;
                 
                 if (statusLabel != null)
@@ -2760,86 +2867,111 @@ namespace Exoptimizer
 
         private static void UndoExtremeOptimizations()
         {
+            // Services touched by extreme mode are already handled by
+            // SystemGuard.RestoreAllTrackedServices (called just before this
+            // in UndoOptimizations) - this only needs to revert the registry
+            // tweaks extreme mode applies directly.
             try
             {
-                // Re-enable critical services
-                string[] criticalServices = { "WinDefend", "WdNisSvc", "wuauserv", "UsoSvc", "BITS", "EventLog" };
-                
-                foreach (string service in criticalServices)
-                {
-                    RunCommand($"sc config \"{service}\" start= auto");
-                }
-
-                // Reset visual effects to default
+                // Reset visual effects back to "Let Windows choose"
                 Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects", 
                     "VisualFXSetting", 0, RegistryValueKind.DWord);
 
                 // Re-enable Windows Defender
                 Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender", 
                     "DisableAntiSpyware", 0, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection", 
+                    "DisableRealtimeMonitoring", 0, RegistryValueKind.DWord);
 
                 // Reset telemetry to default
                 Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection", 
                     "AllowTelemetry", 1, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection", 
+                    "AllowTelemetry", 1, RegistryValueKind.DWord);
+
+                // Reset CPU scheduling and memory tweaks back to Windows defaults
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\PriorityControl", 
+                    "Win32PrioritySeparation", 2, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling", 
+                    "PowerThrottlingOff", 0, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management", 
+                    "DisablePagingExecutive", 0, RegistryValueKind.DWord);
+
+                // Re-enable Windows Error Reporting
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Windows Error Reporting", 
+                    "Disabled", 0, RegistryValueKind.DWord);
             }
             catch { }
         }
 
         // Optimization methods
-        private static void CreateRestorePoint()
+        /// <summary>
+        /// Creates a System Restore point, and returns whether it actually
+        /// worked. Two things silently defeat "Checkpoint-Computer" on most
+        /// consumer PCs: System Protection is off by default for the system
+        /// drive, and Windows only allows one automatic restore point every
+        /// 24 hours unless that limit is explicitly disabled. Both are fixed
+        /// here first, which is what makes "Can't use restore points" go away.
+        /// </summary>
+        private static (bool Success, string Message) CreateRestorePoint()
         {
             try
             {
-                var psi = new ProcessStartInfo
-                {
-                    FileName = "powershell.exe",
-                    Arguments = "-Command \"Checkpoint-Computer -Description 'Exoptimizer v2.1.3 Backup' -RestorePointType 'MODIFY_SETTINGS'\"",
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-                
-                using var process = Process.Start(psi);
-                process?.WaitForExit();
+                string systemDrive = Path.GetPathRoot(Environment.SystemDirectory) ?? @"C:\";
+
+                RunCommand($"powershell.exe -Command \"Enable-ComputerRestore -Drive '{systemDrive}' -ErrorAction SilentlyContinue\"", out _, out _);
+
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore",
+                    "SystemRestorePointCreationFrequency", 0, RegistryValueKind.DWord);
+
+                bool success = RunCommand(
+                    $"powershell.exe -Command \"Checkpoint-Computer -Description 'Exoptimizer v{AppVersion} Backup' -RestorePointType 'MODIFY_SETTINGS'\"",
+                    out _, out string error);
+
+                if (success) return (true, "Restore point created.");
+
+                return (false, string.IsNullOrWhiteSpace(error)
+                    ? "Windows declined to create a restore point (it may already have one from within the last 24 hours)."
+                    : error.Trim());
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to create restore point: {ex.Message}", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return (false, ex.Message);
             }
         }
 
-        private static void DisableUnnecessaryServices()
+        private static readonly string[] NonEssentialServices = {
+            "Fax", "Spooler", "TabletInputService", "Themes", "WSearch", "SysMain",
+            "DiagTrack", "dmwappushservice", "MapsBroker", "lfsvc",
+            "lltdsvc", "AppVClient", "NetTcpPortSharing", "RemoteAccess", "RemoteRegistry",
+            "WbioSrvc", "WMPNetworkSvc", "WpcMonSvc", "SessionEnv", "TermService",
+            "UmRdpService", "RpcLocator", "WerSvc", "Wecsvc", "FontCache", "stisvc",
+            "wisvc", "PcaSvc", "CscService", "defragsvc", "wuauserv", "UsoSvc", "WaaSMedicSvc"
+        };
+
+        private static void DisableUnnecessaryServices(Action<string>? onServiceStep = null)
         {
-            string[] services = {
-                "Fax", "Spooler", "TabletInputService", "Themes", "WSearch", "SysMain",
-                "DiagTrack", "dmwappushservice", "MapsBroker", "lfsvc", "SharedAccess",
-                "lltdsvc", "AppVClient", "NetTcpPortSharing", "RemoteAccess", "RemoteRegistry",
-                "WbioSrvc", "WMPNetworkSvc", "WpcMonSvc", "SessionEnv", "TermService",
-                "UmRdpService", "RpcLocator", "WerSvc", "Wecsvc", "FontCache", "stisvc",
-                "wisvc", "PcaSvc", "CscService", "defragsvc", "wuauserv", "UsoSvc", "WaaSMedicSvc"
-            };
-
-            foreach (string service in services)
-            {
-                try
-                {
-                    RunCommand($"sc config \"{service}\" start= disabled");
-                }
-                catch { }
-            }
+            SystemGuard.DisableServicesSafely(NonEssentialServices, (name, current, total) =>
+                onServiceStep?.Invoke(name), alsoStop: false);
         }
 
+        // Older versions disabled TCP auto-tuning, disabled RSC, forced legacy
+        // CTCP congestion control, and blindly forced every adapter (by
+        // hardcoded name, which doesn't always match a real adapter) to
+        // MTU 1500. Several of those settings were removed from Windows years
+        // ago and silently fail; the rest generally make throughput *worse*
+        // on modern hardware and can break custom setups (VPNs, PPPoE) that
+        // need a non-default MTU. This keeps only the small set of tweaks
+        // that are still genuinely safe and useful on Windows 10/11:
+        // Receive Side Scaling spreads network interrupt handling across CPU
+        // cores, and this makes sure auto-tuning is explicitly at its normal,
+        // healthy default in case an older tool (or a previous Exoptimizer
+        // version) left it disabled.
         private static void OptimizeNetworkSettings()
         {
             string[] commands = {
-                "netsh int tcp set global autotuninglevel=disabled",
-                "netsh int tcp set global chimney=enabled",
+                "netsh int tcp set global autotuninglevel=normal",
                 "netsh int tcp set global rss=enabled",
-                "netsh int tcp set global netdma=enabled",
-                "netsh int tcp set global dca=enabled",
-                "netsh int tcp set global rsc=disabled",
-                "netsh int tcp set heuristics disabled",
-                "netsh int tcp set global nonsackrttresiliency=disabled",
-                "netsh int tcp set supplemental internet congestionprovider=ctcp"
             };
 
             foreach (string command in commands)
@@ -2872,7 +3004,11 @@ namespace Exoptimizer
             catch { }
         }
 
-        private static void DisableWindowsDefender()
+        // The only supported, fully reversible way to turn off real-time
+        // protection: the same registry policy Group Policy/Intune use. Unlike
+        // disabling WinDefend/WdBoot/WdFilter at the service level (removed in
+        // 3.0.0), this never touches the antimalware driver itself.
+        private static void DisableWindowsDefenderRealtimeProtection()
         {
             try
             {
@@ -2902,6 +3038,15 @@ namespace Exoptimizer
 
         private static void RunCommand(string command)
         {
+            RunCommand(command, out _, out _);
+        }
+
+        /// <summary>Same as RunCommand, but returns whether it succeeded and captures its output - used where we actually need to know the result (e.g. restore point creation).</summary>
+        private static bool RunCommand(string command, out string output, out string error)
+        {
+            output = string.Empty;
+            error = string.Empty;
+
             try
             {
                 var psi = new ProcessStartInfo
@@ -2915,9 +3060,18 @@ namespace Exoptimizer
                 };
 
                 using var process = Process.Start(psi);
-                process?.WaitForExit();
+                if (process == null) return false;
+
+                output = process.StandardOutput.ReadToEnd();
+                error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                return process.ExitCode == 0;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                return false;
+            }
         }
     }
 }
