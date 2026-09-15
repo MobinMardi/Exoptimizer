@@ -5,6 +5,7 @@ using System.IO;
 using System.Management;
 using System.Security.Principal;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace Exoptimizer
 
     public partial class MainForm : Form
     {
-        public const string AppVersion = "3.0.0";
+        public const string AppVersion = "3.0.1";
 
         private bool isOptimized = false;
         private bool valorantPriorityActive = false;
@@ -48,6 +49,11 @@ namespace Exoptimizer
         private Panel? contentPanel;
         private Panel? navigationPanel;
         private string currentSection = "optimization";
+
+        // Update checking
+        private Label? updateBadge;
+        private Label? updateStatusLabel;
+        private UpdateCheckResult? latestUpdateResult;
 
         // System Monitor controls
         private Label? cpuMonitorLabel;
@@ -116,6 +122,29 @@ namespace Exoptimizer
             
             // Load default content after everything is initialized
             this.Load += (s, e) => LoadOptimizationContent();
+            this.Load += async (s, e) => await CheckForUpdatesOnStartupAsync();
+        }
+
+        /// <summary>
+        /// Checks GitHub for a newer release once, shortly after the window
+        /// appears. Runs in the background (never blocks the UI) and never
+        /// shows a popup on its own - a silent failure here (no internet,
+        /// GitHub unreachable, etc.) should be invisible to the user. The
+        /// "Check for Updates" button in Settings surfaces the same check
+        /// with visible feedback either way.
+        /// </summary>
+        private async Task CheckForUpdatesOnStartupAsync()
+        {
+            var result = await UpdateChecker.CheckForUpdateAsync();
+
+            if (this.IsDisposed || !this.IsHandleCreated) return;
+
+            latestUpdateResult = result;
+
+            if (result.Success && result.UpdateAvailable && updateBadge != null)
+            {
+                updateBadge.Visible = true;
+            }
         }
 
         private void ApplyTheme()
@@ -165,6 +194,12 @@ namespace Exoptimizer
                             navBtn.ForeColor = navBtn.Tag.ToString() == currentSection ? PrimaryColor : TextSecondary;
                             navBtn.FlatAppearance.MouseOverBackColor = isDarkMode ? 
                                 Color.FromArgb(79, 84, 92) : Color.FromArgb(241, 245, 249);
+                        }
+                        else if (control == updateBadge)
+                        {
+                            // Keep the update-available badge red regardless of
+                            // theme - it's an alert color, not body text.
+                            control.ForeColor = DangerColor;
                         }
                         else if (control is Label titleLabel)
                         {
@@ -313,10 +348,28 @@ namespace Exoptimizer
             var navMonitor = CreateNavButton("System Monitor", "monitor", new Point(700, 15));
             var navRestore = CreateNavButton("System Restore", "restore", new Point(850, 15));
             var navSettings = CreateNavButton("Settings", "settings", new Point(1000, 15));
-            
+
+            // Small "update available" badge, overlaid on the Settings button.
+            // Hidden by default; CheckForUpdatesOnStartupAsync/the manual
+            // "Check for Updates" button in Settings makes it visible.
+            updateBadge = new Label
+            {
+                Text = "●",
+                Font = new Font("Segoe UI", 14F, FontStyle.Bold),
+                ForeColor = DangerColor,
+                BackColor = Color.Transparent,
+                Location = new Point(1125, 10),
+                Size = new Size(20, 20),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Visible = false,
+                Cursor = Cursors.Hand
+            };
+            var updateBadgeTip = new ToolTip();
+            updateBadgeTip.SetToolTip(updateBadge, "A new version is available - see Settings");
+            updateBadge.Click += (s, e) => NavigateToSection("settings");
 
             navBar.Controls.AddRange(new Control[] { 
-                titleLabel, navOptimization, navValorant, navTools, navMonitor, navRestore, navSettings 
+                titleLabel, navOptimization, navValorant, navTools, navMonitor, navRestore, navSettings, updateBadge
             });
 
             // Create content area - positioned below navigation bar with reduced padding
@@ -1291,7 +1344,7 @@ namespace Exoptimizer
 
             var versionInfo = new Label
             {
-                Text = $"Version: {AppVersion}" + Environment.NewLine + "mDev (Mobin Mardi)" + Environment.NewLine + "Copyright © 2025",
+                Text = $"Version: {AppVersion}" + Environment.NewLine + "mDev (Mobin Mardi)" + Environment.NewLine + "Copyright © 2026",
                 Location = new Point(0, 210),
                 Size = new Size(300, 75),
                 ForeColor = TextSecondary,
@@ -1299,8 +1352,28 @@ namespace Exoptimizer
                 BackColor = Color.Transparent
             };
 
+            var checkUpdatesBtn = CreateModernButton("Check for Updates", SecondaryColor, new Point(0, 290), new Size(160, 35));
+            checkUpdatesBtn.Click += CheckForUpdatesButton_Click;
+
+            var viewChangelogBtn = CreateModernButton("View Changelog", SecondaryColor, new Point(170, 290), new Size(150, 35));
+            viewChangelogBtn.Click += (s, e) =>
+            {
+                using var changelogForm = new ChangelogForm(CardColor, BackgroundColor, TextPrimary, TextSecondary, PrimaryColor, BorderColor);
+                changelogForm.ShowDialog(this);
+            };
+
+            updateStatusLabel = new Label
+            {
+                Text = BuildUpdateStatusText(),
+                Location = new Point(0, 332),
+                Size = new Size(760, 30),
+                ForeColor = (latestUpdateResult?.Success == true && latestUpdateResult.UpdateAvailable) ? SuccessColor : TextSecondary,
+                Font = new Font("Segoe UI", 9F),
+                BackColor = Color.Transparent
+            };
+
             // Reset button
-            var resetBtn = CreateModernButton("Reset to Defaults", WarningColor, new Point(0, 300), new Size(140, 35));
+            var resetBtn = CreateModernButton("Reset to Defaults", WarningColor, new Point(0, 375), new Size(140, 35));
             resetBtn.Click += (s, e) =>
             {
                 var result = MessageBox.Show("Reset all settings to default?", "Reset Settings", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -1324,10 +1397,82 @@ namespace Exoptimizer
             };
 
             settingsCard.Controls.AddRange(new Control[] { 
-                appearanceLabel, darkModeCheckBox, trayLabel, trayCheckBox, versionLabel, versionInfo, resetBtn
+                appearanceLabel, darkModeCheckBox, trayLabel, trayCheckBox, versionLabel, versionInfo,
+                checkUpdatesBtn, viewChangelogBtn, updateStatusLabel, resetBtn
             });
 
             contentPanel.Controls.AddRange(new Control[] { titleLabel, descLabel, settingsCard });
+        }
+
+        private string BuildUpdateStatusText()
+        {
+            if (latestUpdateResult == null) return "Click \"Check for Updates\" to look for a newer release.";
+            if (!latestUpdateResult.Success) return $"Last check failed: {latestUpdateResult.ErrorMessage}";
+            if (latestUpdateResult.UpdateAvailable) return $"🔔 A new version is available: v{latestUpdateResult.LatestVersion} (you have v{AppVersion})";
+            return $"✓ You're up to date (v{AppVersion}).";
+        }
+
+        private async void CheckForUpdatesButton_Click(object sender, EventArgs e)
+        {
+            var button = sender as Button;
+            string originalText = button?.Text ?? "Check for Updates";
+
+            if (button != null)
+            {
+                button.Enabled = false;
+                button.Text = "Checking...";
+            }
+
+            var result = await UpdateChecker.CheckForUpdateAsync();
+            latestUpdateResult = result;
+
+            // The user may have navigated away from Settings while this was
+            // in flight, which disposes the old controls - guard before
+            // touching them again.
+            if (button != null && !button.IsDisposed)
+            {
+                button.Enabled = true;
+                button.Text = originalText;
+            }
+
+            if (updateBadge != null)
+            {
+                updateBadge.Visible = result.Success && result.UpdateAvailable;
+            }
+
+            if (updateStatusLabel != null)
+            {
+                updateStatusLabel.Text = BuildUpdateStatusText();
+                updateStatusLabel.ForeColor = (result.Success && result.UpdateAvailable) ? SuccessColor : TextSecondary;
+            }
+
+            if (!result.Success)
+            {
+                MessageBox.Show(
+                    $"Couldn't check for updates: {result.ErrorMessage}" + Environment.NewLine + Environment.NewLine +
+                    "Make sure you're connected to the internet.",
+                    "Check for Updates", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (result.UpdateAvailable)
+            {
+                var openResult = MessageBox.Show(
+                    $"A new version is available: v{result.LatestVersion}" + Environment.NewLine +
+                    $"You're currently running v{AppVersion}." + Environment.NewLine + Environment.NewLine +
+                    "Open the release page now?",
+                    "Update Available", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (openResult == DialogResult.Yes && !string.IsNullOrWhiteSpace(result.ReleaseUrl))
+                {
+                    try { Process.Start(new ProcessStartInfo(result.ReleaseUrl) { UseShellExecute = true }); }
+                    catch { }
+                }
+            }
+            else
+            {
+                MessageBox.Show($"You're up to date! (v{AppVersion})", "Check for Updates", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         // Deep Cleanup Button Click Handler

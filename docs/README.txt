@@ -1,4 +1,4 @@
-Exoptimizer v3.0.0 - Advanced Gaming Optimization Tool
+Exoptimizer v3.0.1 - Advanced Gaming Optimization Tool
 =====================================================
 
 🎮 OVERVIEW:
@@ -107,9 +107,9 @@ Exoptimizer is a comprehensive Windows gaming optimization tool designed to maxi
 • For technical issues: Check Windows Event Viewer for detailed error logs
 • Before contacting support: Try "Reset to Defaults" in Settings
 
-Version: 3.0.0
+Version: 3.0.1
 Developer: mDev (Mobin Mardi)
-Copyright © 2025 - Licensed under MIT License
+Copyright © 2026 - Licensed under MIT License
 Built with .NET 6.0 for Windows 10/11
 
 Thank you for choosing Exoptimizer for your gaming optimization needs!

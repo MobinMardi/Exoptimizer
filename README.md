@@ -8,7 +8,7 @@
 
 <div align="center">
 
-  [![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
+  [![Version](https://img.shields.io/badge/version-3.0.1-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
   [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
   [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey.svg)]()
   [![.NET](https://img.shields.io/badge/.NET-6.0-purple.svg)]()
@@ -60,6 +60,8 @@
 - **System Tray Integration**: Minimize-to-tray functionality with background monitoring
 - **Settings Persistence**: Configuration saved across application restarts
 - **Customizable Interface**: Appearance and behavior customization options
+- **Automatic Update Checker**: Checks GitHub for a newer release on startup (with a manual "Check for Updates" button too) and notifies you without any intrusive popups
+- **In-App Changelog Viewer**: Browse release notes for the current and previous versions directly inside the app
 
 ## 📋 System Requirements
 
@@ -185,4 +187,4 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 
 ⭐ **Star this repository if you find it helpful!**
 
-**Version**: 3.0.0 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2026 - Licensed under MIT License
+**Version**: 3.0.1 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2026 - Licensed under MIT License

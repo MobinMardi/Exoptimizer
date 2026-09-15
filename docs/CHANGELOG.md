@@ -1,5 +1,13 @@
 # Exoptimizer Changelog
 
+## Version 3.0.1
+### 🗓️ Maintenance
+- Updated copyright and license year references from 2025 to 2026 (app UI, installer, README, LICENSE).
+
+### ✨ New Features
+- **Automatic update checker** - Exoptimizer now checks GitHub for a newer release shortly after starting, and shows a small badge on the Settings tab if one is found. A "Check for Updates" button in Settings also lets you check manually at any time, with clear feedback either way (up to date, update available, or check failed).
+- **In-app changelog viewer** - a "View Changelog" button in Settings opens this changelog inside the app itself, with one tab per version, newest first.
+
 ## Version 3.0.0
 ### 🛡️ Critical Safety Fixes
 This release fixes the root cause of the most common issues reported against 2.1.x: **restore points failing to create or apply, System Restore no longer working, and the network adapter/service failing to start after optimizing.** All of it traced back to the same mistake - several optimization presets were setting critical Windows services (System Restore's VSS/swprv, and the network stack's nsi/NlaSvc/iphlpsvc/RasMan) to "Disabled" instead of "Manual", which stops Windows itself from ever starting them again.
