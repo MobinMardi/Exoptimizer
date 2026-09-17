@@ -8,7 +8,7 @@
 
 <div align="center">
 
-  [![Version](https://img.shields.io/badge/version-3.0.1-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
+  [![Version](https://img.shields.io/badge/version-3.0.2-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
   [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
   [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey.svg)]()
   [![.NET](https://img.shields.io/badge/.NET-6.0-purple.svg)]()
@@ -31,7 +31,7 @@
 ### 🎯 VALORANT Integration
 - **Process Priority Boosting**: High/RealTime priority options for VALORANT
 - **Network QoS Policy**: Prioritized game traffic management
-- **Riot Vanguard Management**: One-click service start and monitoring
+- **Riot Vanguard Monitoring**: Live status display so you always know if it's running
 - **Real-time Process Monitoring**: Live tracking of VALORANT and Riot Client status
 
 ### 📊 System Monitoring
@@ -57,6 +57,7 @@
 
 ### ⚙️ Advanced Settings
 - **Dark Mode**: Onyx Black theme with Discord Blurple accents
+- **Resizable, DPI-Aware Window**: Adapts to your display's resolution and scaling instead of a fixed 1200x700 window
 - **System Tray Integration**: Minimize-to-tray functionality with background monitoring
 - **Settings Persistence**: Configuration saved across application restarts
 - **Customizable Interface**: Appearance and behavior customization options
@@ -187,4 +188,4 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 
 ⭐ **Star this repository if you find it helpful!**
 
-**Version**: 3.0.1 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2026 - Licensed under MIT License
+**Version**: 3.0.2 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2026 - Licensed under MIT License

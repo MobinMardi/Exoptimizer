@@ -23,7 +23,7 @@ namespace Exoptimizer
 
     public partial class MainForm : Form
     {
-        public const string AppVersion = "3.0.1";
+        public const string AppVersion = "3.0.2";
 
         private bool isOptimized = false;
         private bool valorantPriorityActive = false;
@@ -109,6 +109,93 @@ namespace Exoptimizer
         private Color WarningColor;
         private Color DangerColor;
 
+        // DPI scaling - the whole UI is hand-positioned in pixels (there's no
+        // WinForms Designer file backing it), so WinForms' own
+        // AutoScaleMode/PerformAutoScale can't be relied on for content built
+        // after the form has already loaded (every tab's content is rebuilt
+        // from scratch on each navigation). dpiScale is computed once at
+        // startup from the actual display, and ApplyDpiScale (below) is
+        // applied by hand to each freshly-built batch of controls instead.
+        private readonly float dpiScale = GetSystemDpiScale();
+
+        private static float GetSystemDpiScale()
+        {
+            try
+            {
+                using var g = Graphics.FromHwnd(IntPtr.Zero);
+                float scale = g.DpiX / 96f;
+                // Guard against an unreasonable reading so the UI can never
+                // become unusably tiny or huge.
+                if (scale < 0.75f) scale = 0.75f;
+                if (scale > 2.5f) scale = 2.5f;
+                return scale;
+            }
+            catch
+            {
+                return 1.0f;
+            }
+        }
+
+        /// <summary>
+        /// Recursively scales a freshly-built control tree's Location, Size,
+        /// and Font by dpiScale. Safe to call repeatedly on different
+        /// subtrees (e.g. once for the nav bar, once per tab after it's
+        /// rebuilt) because it only ever touches controls that were just
+        /// created - it never re-scales something it already scaled, since
+        /// those controls get disposed and rebuilt fresh on every navigation.
+        /// includeRoot should be false for a container (like contentPanel)
+        /// that is itself reused across calls rather than rebuilt each time -
+        /// otherwise its own inherited Font would get scaled again on every
+        /// call and compound indefinitely. Its freshly-built children are
+        /// still scaled either way.
+        /// </summary>
+        private void ApplyDpiScale(Control root, bool includeRoot = true)
+        {
+            if (Math.Abs(dpiScale - 1f) < 0.01f) return; // 100% scaling: nothing to do
+
+            // Snapshot every control's current Location/Size/Font BEFORE
+            // changing anything. Scaling a parent first and then reading a
+            // child's (possibly inherited) Font from it would double-scale
+            // that child, so all the "before" values are captured up front.
+            var snapshot = new List<(Control Control, Point Location, Size Size, Font? Font)>();
+
+            if (includeRoot)
+            {
+                Collect(root);
+            }
+            else
+            {
+                foreach (Control child in root.Controls)
+                {
+                    Collect(child);
+                }
+            }
+
+            foreach (var (control, location, size, font) in snapshot)
+            {
+                control.Location = new Point((int)Math.Round(location.X * dpiScale), (int)Math.Round(location.Y * dpiScale));
+                control.Size = new Size((int)Math.Round(size.Width * dpiScale), (int)Math.Round(size.Height * dpiScale));
+
+                if (font != null)
+                {
+                    float scaledSize = font.Size * dpiScale;
+                    if (scaledSize > 1f)
+                    {
+                        control.Font = new Font(font.FontFamily, scaledSize, font.Style);
+                    }
+                }
+            }
+
+            void Collect(Control control)
+            {
+                snapshot.Add((control, control.Location, control.Size, control.Font));
+                foreach (Control child in control.Controls)
+                {
+                    Collect(child);
+                }
+            }
+        }
+
         public MainForm()
         {
             settingsFilePath = Path.Combine(Application.StartupPath, "exoptimizer_settings.json");
@@ -121,7 +208,7 @@ namespace Exoptimizer
             ApplyLoadedSettings();
             
             // Load default content after everything is initialized
-            this.Load += (s, e) => LoadOptimizationContent();
+            this.Load += (s, e) => { LoadOptimizationContent(); if (contentPanel != null) ApplyDpiScale(contentPanel, includeRoot: false); };
             this.Load += async (s, e) => await CheckForUpdatesOnStartupAsync();
         }
 
@@ -297,16 +384,21 @@ namespace Exoptimizer
             }
             catch { }
             
-            // Form properties - Modern styling with fixed size (increased width)
+            // Form properties - resizable and DPI-aware so the layout no
+            // longer breaks on displays other than the one this was designed
+            // at (96 DPI / 1200x700). AutoScaleMode is intentionally off:
+            // scaling is handled by hand via ApplyDpiScale (see above) so it
+            // also covers tab content that gets rebuilt after the form has
+            // already loaded, which WinForms' own AutoScaleMode can't do.
             this.Text = "Exoptimizer";
-            this.Size = new Size(1200, 700); // Increased width to 1200
+            this.AutoScaleMode = AutoScaleMode.None;
+            this.Size = new Size((int)(1200 * dpiScale), (int)(700 * dpiScale));
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
-            this.MinimumSize = new Size(1200, 700);
-            this.MaximumSize = new Size(1200, 700);
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MaximizeBox = true;
+            this.MinimumSize = new Size((int)(900 * dpiScale), (int)(550 * dpiScale));
             this.BackColor = BackgroundColor;
-            this.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
+            this.Font = new Font("Segoe UI", 9F * dpiScale, FontStyle.Regular);
             
             CreateInterface();
             this.ResumeLayout(false);
@@ -372,13 +464,22 @@ namespace Exoptimizer
                 titleLabel, navOptimization, navValorant, navTools, navMonitor, navRestore, navSettings, updateBadge
             });
 
-            // Create content area - positioned below navigation bar with reduced padding
+            // The nav bar is fully built now - scale it for the current
+            // display's DPI. It's built once (here, in the constructor) and
+            // never rebuilt, unlike tab content, so this one call covers it
+            // for the whole session.
+            ApplyDpiScale(navBar);
+
+            // Create content area - fills whatever space remains below the
+            // nav bar, however the window is sized or resized. AutoScroll
+            // means that if a tab's content (once DPI-scaled) is still
+            // larger than the available space, a scrollbar appears instead
+            // of content being cut off.
             contentPanel = new Panel
             {
-                Location = new Point(0, 60), // Position below nav bar
-                Size = new Size(1200, 640),  // Adjusted for wider form
+                Dock = DockStyle.Fill,
                 BackColor = BackgroundColor,
-                Padding = new Padding(0, 0, 0, 0), // Remove padding since we're adding margins manually
+                Padding = new Padding(0, 0, 0, 0),
                 AutoScroll = true
             };
 
@@ -434,6 +535,12 @@ namespace Exoptimizer
                 case "restore": LoadRestoreContent(); break;
                 case "settings": LoadSettingsContent(); break;
             }
+
+            // Every LoadXContent() above rebuilds contentPanel's children from
+            // scratch, so scale this fresh batch for the current DPI - one
+            // call here covers every tab instead of repeating it in each
+            // LoadXContent method.
+            if (contentPanel != null) ApplyDpiScale(contentPanel, includeRoot: false);
         }
 
         private Panel CreateCard(Point location, Size size)
@@ -511,6 +618,7 @@ namespace Exoptimizer
 
             // Card container
             var optimizationCard = CreateCard(new Point(40, 140), new Size(900, 320)); // Added 40px margin from left
+            optimizationCard.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
             // Check current optimization status
             CheckOptimizationStatus();
@@ -790,6 +898,7 @@ namespace Exoptimizer
 
             // VALORANT Priority Card
             var valorantCard = CreateCard(new Point(40, 140), new Size(800, 180));
+            valorantCard.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
             // Priority section header
             var priorityHeaderLabel = new Label
@@ -861,6 +970,7 @@ namespace Exoptimizer
 
             // Card container
             var toolsCard = CreateCard(new Point(40, 140), new Size(800, 250)); // Added 40px margin
+            toolsCard.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
             // System Tools section
             var systemToolsLabel = new Label
@@ -959,6 +1069,7 @@ namespace Exoptimizer
 
             // Card container
             var monitorCard = CreateCard(new Point(40, 140), new Size(800, 400)); // Added 40px margin
+            monitorCard.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
             // Section header
             var statsLabel = new Label
@@ -1045,46 +1156,9 @@ namespace Exoptimizer
                 BackColor = Color.Transparent
             };
 
-            // Add Vanguard start button with play icon
-            var startVanguardButton = new Button
-            {
-                Text = "⏻",
-                Location = new Point(180, 260), // Positioned under the Vanguard status text
-                Size = new Size(24, 32), // Square size instead of 24x32
-                BackColor = Color.Transparent, // Transparent background
-                ForeColor = Color.FromArgb(237, 66, 69), // Red color to match Riot theme
-                FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-                Cursor = Cursors.Hand,
-                Visible = true, // Temporarily visible for testing
-                Tag = "vanguardStartBtn" // Tag for easy identification
-            };
-
-            startVanguardButton.FlatAppearance.BorderSize = 0;
-            startVanguardButton.FlatAppearance.MouseOverBackColor = Color.Transparent;
-            startVanguardButton.FlatAppearance.MouseDownBackColor = Color.Transparent;
-            startVanguardButton.Click += StartVanguardButton_Click;
-
-            // Add hover effects for the transparent button
-            startVanguardButton.MouseEnter += (s, e) =>
-            {
-                if (startVanguardButton.Enabled)
-                {
-                    startVanguardButton.BackColor = Color.FromArgb(30, 237, 66, 69); // Semi-transparent red
-                }
-            };
-
-            startVanguardButton.MouseLeave += (s, e) =>
-            {
-                if (startVanguardButton.Enabled)
-                {
-                    startVanguardButton.BackColor = Color.Transparent;
-                }
-            };
-
             monitorCard.Controls.AddRange(new Control[] { 
                 statsLabel, cpuMonitorLabel, memoryMonitorLabel, networkMonitorLabel, 
-                processLabel, valorantProcessLabel, riotClientLabel, vanguardLabel, startVanguardButton
+                processLabel, valorantProcessLabel, riotClientLabel, vanguardLabel
             });
 
             contentPanel.Controls.AddRange(new Control[] { titleLabel, descLabel, monitorCard });
@@ -1123,6 +1197,7 @@ namespace Exoptimizer
 
             // Card container
             var restoreCard = CreateCard(new Point(40, 140), new Size(800, 280)); // Added 40px margin
+            restoreCard.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
             // First row of buttons
             var createRestoreBtn = CreateModernButton("Create Restore Point", PrimaryColor, new Point(0, 20), new Size(150, 40));
@@ -1250,6 +1325,7 @@ namespace Exoptimizer
 
             // Card container
             var settingsCard = CreateCard(new Point(40, 140), new Size(800, 450));
+            settingsCard.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
             // Appearance section
             var appearanceLabel = new Label
@@ -2211,7 +2287,7 @@ namespace Exoptimizer
                     }
                 }
 
-                // Check Riot Vanguard and manage start button visibility
+                // Check Riot Vanguard status
                 var vanguardProcesses = Process.GetProcessesByName("vgc");
                 bool vanguardRunning = vanguardProcesses.Length > 0;
                 
@@ -2228,26 +2304,6 @@ namespace Exoptimizer
                         vanguardLabel.ForeColor = TextSecondary;
                     }
                 }
-
-                // Show/hide the start Vanguard button based on service status
-                if (currentSection == "monitor" && contentPanel != null)
-                {
-                    foreach (Control control in contentPanel.Controls)
-                    {
-                        if (control is Panel panel)
-                        {
-                            foreach (Control panelControl in panel.Controls)
-                            {
-                                if (panelControl is Button btn && btn.Tag?.ToString() == "vanguardStartBtn")
-                                {
-                                    btn.Visible = !vanguardRunning; // Show button only when Vanguard is not running
-                                    btn.BringToFront(); // Ensure button is on top
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
             }
             catch
             {
@@ -2257,48 +2313,6 @@ namespace Exoptimizer
                     riotClientLabel.Text = "Riot Client: Unable to check";
                 if (vanguardLabel != null)
                     vanguardLabel.Text = "Riot Vanguard: Unable to check";
-            }
-        }
-
-        private void StartVanguardButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                var result = MessageBox.Show(
-                    "Start Riot Vanguard service?" + Environment.NewLine + Environment.NewLine +
-                    "This will start the vgc.exe service which is required for VALORANT anti-cheat." + Environment.NewLine +
-                    "You may need to restart VALORANT after starting Vanguard.",
-                    "Start Riot Vanguard",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question
-                );
-
-                if (result == DialogResult.Yes)
-                {
-                    // Try to start the vgc service
-                    RunCommand("sc start vgc");
-                    
-                    // Wait a moment for the service to start
-                    System.Threading.Thread.Sleep(2000);
-                    
-                    // Update the process status immediately
-                    UpdateProcessStatuses();
-                    
-                    MessageBox.Show(
-                        "Riot Vanguard service start command sent." + Environment.NewLine + Environment.NewLine +
-                        "If Vanguard doesn't start, you may need to:" + Environment.NewLine +
-                        "• Restart your computer" + Environment.NewLine +
-                        "• Reinstall VALORANT" + Environment.NewLine +
-                        "• Check Windows services manually",
-                        "Vanguard Start",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information
-                    );
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to start Riot Vanguard: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

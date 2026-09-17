@@ -24,6 +24,8 @@ namespace Exoptimizer
         public ChangelogForm(Color cardColor, Color backgroundColor, Color textPrimary, Color textSecondary, Color accentColor, Color borderColor)
         {
             Text = "Exoptimizer - Changelog";
+            AutoScaleMode = AutoScaleMode.Dpi;
+            AutoScaleDimensions = new SizeF(96F, 96F);
             Size = new Size(720, 560);
             MinimumSize = new Size(560, 400);
             StartPosition = FormStartPosition.CenterParent;
