@@ -1,18 +1,5 @@
 # Exoptimizer Changelog
 
-## Version 3.0.2
-### 🖥️ Display & Resolution Fixes
-Earlier versions used a window locked to a fixed 1200x700 size with everything positioned at hand-picked pixel coordinates. On a display with different scaling (125%/150%/200%) or a smaller screen resolution, this caused text to overflow its label/button, controls to overlap, and content to be cut off or run off the edge of the window ("finish early in their view"). This release addresses the root cause:
-
-- **Per-Monitor V2 DPI awareness** - the app now tells Windows it handles its own DPI scaling, instead of Windows silently bitmap-stretching the whole window (which caused blurry, misaligned text and controls on anything other than 100% display scaling).
-- **Automatic DPI scaling for every screen** - on startup, Exoptimizer measures the actual display's scaling and resizes and repositions every button, label, and panel to match, proportionally - including tab content, which is rebuilt fresh every time you switch tabs, so this is applied every time rather than only once at startup.
-- **Resizable, maximizable window** - the window is no longer locked to a fixed size. It can now be resized or maximized, and starts at a size that already accounts for your display's scaling.
-- **Scroll instead of cut off** - if a tab's content is ever still larger than the visible window (a very small window, or an unusually large scaling factor), a scrollbar now appears instead of content silently disappearing off the edge.
-- **Cards resize with the window** - each tab's main panel now stretches to fill the available width instead of staying a fixed size, so resizing or maximizing the window doesn't leave things looking cramped or oddly placed.
-
-### 🧹 Removed
-- **Riot Vanguard "start service" button** - removed, along with its power-icon glyph and the related click handler. The Riot Vanguard *status* display (running / not running) in System Monitor is unchanged and still updates live.
-
 ## Version 3.0.1
 ### 🗓️ Maintenance
 - Updated copyright and license year references from 2025 to 2026 (app UI, installer, README, LICENSE).
