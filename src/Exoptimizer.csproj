@@ -7,10 +7,10 @@
     <Nullable>enable</Nullable>
     <AssemblyTitle>Exoptimizer</AssemblyTitle>
     <AssemblyDescription>Windows Gaming Optimization Tool by Exoptimizer Team - Advanced System Performance Enhancement Suite with Extreme FPS Boost Mode</AssemblyDescription>
-    <Version>3.0.2</Version>
-    <AssemblyVersion>3.0.2.0</AssemblyVersion>
-    <FileVersion>3.0.2.0</FileVersion>
-    <InformationalVersion>3.0.2</InformationalVersion>
+    <Version>3.0.1</Version>
+    <AssemblyVersion>3.0.1.0</AssemblyVersion>
+    <FileVersion>3.0.1.0</FileVersion>
+    <InformationalVersion>3.0.1</InformationalVersion>
     <Copyright>Copyright © Exoptimizer Team 2026</Copyright>
     <ApplicationIcon>..\assets\icon.ico</ApplicationIcon>
     <PublishSingleFile>true</PublishSingleFile>
