@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace Exoptimizer
 {
     /// <summary>
-    /// Shows docs/CHANGELOG.md inside the app, one tab per "## Version X.Y.Z"
+    /// Shows docs/CHANGELOG.md inside the app, one entry per "## Version X.Y.Z"
     /// section (newest first, matching the file itself). The changelog is
     /// embedded into the assembly at build time (see Exoptimizer.csproj), so
     /// this always works regardless of whether CHANGELOG.md happens to be
@@ -21,82 +21,142 @@ namespace Exoptimizer
         private static readonly Regex VersionHeaderPattern = new(@"^##\s*Version\s+(\S+)\s*$", RegexOptions.Compiled);
         private static readonly Regex BoldPattern = new(@"(\*\*[^*]+\*\*)", RegexOptions.Compiled);
 
-        public ChangelogForm(Color cardColor, Color backgroundColor, Color textPrimary, Color textSecondary, Color accentColor, Color borderColor)
-        {
-            Text = "Exoptimizer - Changelog";
-            Size = new Size(720, 560);
-            MinimumSize = new Size(560, 400);
-            StartPosition = FormStartPosition.CenterParent;
-            BackColor = backgroundColor;
-            Font = new Font("Segoe UI", 9F);
+        private readonly List<NavItem> versionItems = new();
+        private RichTextBox? reader;
 
-            var tabControl = new TabControl
-            {
-                Dock = DockStyle.Fill,
-                Padding = new Point(16, 6)
-            };
+        public ChangelogForm()
+        {
+            AutoScaleMode = AutoScaleMode.None;
+            Text = "Exoptimizer - Changelog";
+            ClientSize = new Size(780, 560);
+            MinimumSize = new Size(640, 440);
+            StartPosition = FormStartPosition.CenterParent;
+            BackColor = Theme.Canvas;
+            Font = Theme.Font(9f);
+            ShowInTaskbar = false;
 
             var sections = ParseChangelog(LoadChangelogText());
 
+            // Right-hand side: the reading area, with a footer holding the Close button.
+            var main = new BufferedPanel { Dock = DockStyle.Fill, BackColor = Theme.Canvas, Padding = new Padding(0, 20, 20, 0) };
+
+            var footer = new BufferedPanel { Dock = DockStyle.Bottom, Height = 68, BackColor = Theme.Canvas };
+            var closeButton = new ModernButton
+            {
+                Text = "Close",
+                Kind = ButtonKind.Filled,
+                Size = new Size(110, 38),
+                DialogResult = DialogResult.Cancel
+            };
+            closeButton.Location = new Point(footer.Width - 20 - closeButton.Width, 16);
+            footer.Controls.Add(closeButton);
+            footer.Resize += (s, e) => closeButton.Left = footer.Width - 20 - closeButton.Width;
+            CancelButton = closeButton;
+
+            var card = new CardPanel { Dock = DockStyle.Fill, Padding = new Padding(24, 20, 14, 20) };
+
             if (sections.Count == 0)
             {
-                var emptyTab = new TabPage("Changelog");
-                emptyTab.Controls.Add(new Label
+                card.Controls.Add(new Label
                 {
                     Text = "No changelog information could be loaded.",
                     Dock = DockStyle.Fill,
                     TextAlign = ContentAlignment.MiddleCenter,
-                    ForeColor = textSecondary
+                    ForeColor = Theme.TextSecondary,
+                    BackColor = Theme.Surface,
+                    Font = Theme.Font(10f)
                 });
-                tabControl.TabPages.Add(emptyTab);
             }
             else
             {
-                foreach (var (version, body) in sections)
+                reader = new RichTextBox
                 {
-                    var tabPage = new TabPage($"v{version}") { BackColor = cardColor };
-
-                    var richTextBox = new RichTextBox
-                    {
-                        Dock = DockStyle.Fill,
-                        ReadOnly = true,
-                        BorderStyle = BorderStyle.None,
-                        BackColor = cardColor,
-                        ForeColor = textPrimary,
-                        Font = new Font("Segoe UI", 10F),
-                        Margin = new Padding(12)
-                    };
-
-                    RenderMarkdownBody(richTextBox, body, textPrimary, accentColor);
-                    richTextBox.Select(0, 0);
-                    richTextBox.ScrollToCaret();
-
-                    tabPage.Controls.Add(richTextBox);
-                    tabControl.TabPages.Add(tabPage);
-                }
+                    Dock = DockStyle.Fill,
+                    ReadOnly = true,
+                    BorderStyle = BorderStyle.None,
+                    BackColor = Theme.Surface,
+                    ForeColor = Theme.TextPrimary,
+                    Font = Theme.Font(10f),
+                    DetectUrls = false
+                };
+                reader.HandleCreated += (s, e) => WindowChrome.ApplyScrollbarTheme(reader);
+                card.Controls.Add(reader);
             }
 
-            var closeButton = new Button
+            main.Controls.Add(card);
+            main.Controls.Add(footer);
+
+            // Left-hand side: one entry per version, newest first (the order of the file).
+            var rail = new BufferedPanel
             {
-                Text = "Close",
-                Dock = DockStyle.Bottom,
-                Height = 40,
-                FlatStyle = FlatStyle.Flat,
-                BackColor = accentColor,
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
-                Cursor = Cursors.Hand
+                Dock = DockStyle.Left,
+                Width = 200,
+                BackColor = Theme.Canvas,
+                AutoScroll = true,
+                Padding = new Padding(16, 20, 8, 16)
             };
-            closeButton.FlatAppearance.BorderSize = 0;
-            closeButton.Click += (s, e) => Close();
-            closeButton.Paint += (s, e) =>
+            rail.Paint += (s, e) =>
             {
-                using var pen = new Pen(borderColor, 1);
-                e.Graphics.DrawLine(pen, 0, 0, closeButton.Width, 0);
+                using var pen = new Pen(Theme.Border, 1f);
+                e.Graphics.DrawLine(pen, rail.Width - 1, 0, rail.Width - 1, rail.Height);
             };
 
-            Controls.Add(tabControl);
-            Controls.Add(closeButton);
+            rail.Controls.Add(new Label
+            {
+                Text = "Changelog",
+                Font = Theme.Font(14f, true),
+                ForeColor = Theme.TextPrimary,
+                BackColor = Color.Transparent,
+                AutoSize = false,
+                Bounds = new Rectangle(20, 20, 160, 28)
+            });
+
+            int y = 64;
+            bool first = true;
+            foreach (var (version, body) in sections)
+            {
+                string versionBody = body;
+                var item = new NavItem
+                {
+                    Text = $"v{version}",
+                    Location = new Point(16, y),
+                    Size = new Size(168, 38),
+                    Selected = first
+                };
+                item.Click += (s, e) => ShowVersion(item, versionBody);
+                rail.Controls.Add(item);
+                versionItems.Add(item);
+
+                if (first && reader != null) ShowBody(versionBody);
+
+                first = false;
+                y += 42;
+            }
+
+            // Docking: the fill panel is added first so the rail claims its edge before it.
+            Controls.Add(main);
+            Controls.Add(rail);
+        }
+
+        private void ShowVersion(NavItem selected, string body)
+        {
+            foreach (var item in versionItems) item.Selected = item == selected;
+            ShowBody(body);
+        }
+
+        private void ShowBody(string body)
+        {
+            if (reader == null) return;
+
+            RenderMarkdownBody(reader, body, Theme.TextPrimary, Theme.AccentText);
+            reader.Select(0, 0);
+            reader.ScrollToCaret();
+        }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            WindowChrome.Apply(this);
         }
 
         private static string LoadChangelogText()

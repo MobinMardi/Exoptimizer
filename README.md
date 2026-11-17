@@ -8,7 +8,7 @@
 
 <div align="center">
 
-  [![Version](https://img.shields.io/badge/version-3.0.1-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
+  [![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
   [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
   [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey.svg)]()
   [![.NET](https://img.shields.io/badge/.NET-6.0-purple.svg)]()
@@ -56,7 +56,8 @@
 - **Extreme Optimization Detection**: Smart detection of already applied extreme tweaks
 
 ### ⚙️ Advanced Settings
-- **Dark Mode**: Onyx Black theme with Discord Blurple accents
+- **Light & Dark Themes**: A minimal, refined interface with a Discord-style blurple accent - pale and airy in light mode, deep ink in dark mode - applied to every window and dialog
+- **Splash Screen**: A short branded start-up screen (app icon and name) in the active theme
 - **System Tray Integration**: Minimize-to-tray functionality with background monitoring
 - **Settings Persistence**: Configuration saved across application restarts
 - **Customizable Interface**: Appearance and behavior customization options
@@ -187,4 +188,4 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 
 ⭐ **Star this repository if you find it helpful!**
 
-**Version**: 3.0.1 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2026 - Licensed under MIT License
+**Version**: 3.1.0 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2026 - Licensed under MIT License

@@ -1,5 +1,33 @@
 # Exoptimizer Changelog
 
+## Version 3.1.0
+### 🎨 Complete UI/UX Overhaul
+A ground-up redesign of the interface - minimal, refined and neat - with **no change to what any button does**.
+
+- **New look** - a calm, spacious layout with rounded cards, Segoe UI typography and a Discord-style **blurple** accent. The light theme is pale and airy; the dark theme is deep ink with softly lit text.
+- **Sidebar navigation** - the top tab bar is now a left sidebar with the app logo, a clear selected state, the update badge on Settings, and an indicator showing whether Exoptimizer is running as administrator.
+- **Splash screen** - Exoptimizer now opens with a short splash showing the app icon and name, in the active light or dark theme. It is skipped when the app is set to start minimized in the system tray.
+- **Redesigned pages** - System Optimization, VALORANT Priority, Performance Tools, System Monitor, System Restore and Settings were all re-laid out. Performance Tools now shows each tool with a short description, and the VALORANT page explains exactly what enabling priority changes.
+- **Modern controls** - flat rounded buttons, animated toggle switches (replacing checkboxes), live gauge tiles on the System Monitor and status indicators with colored dots.
+- **Themed dialogs** - confirmations, warnings, the progress window and the changelog viewer now follow the light/dark theme instead of showing bright system dialogs. The window title bar follows the theme too.
+- **Smoother System Monitor** - CPU, memory and network readings are now gathered in the background, so the window no longer stutters while the monitor page is open.
+
+### 🛠️ Polish & Fixes
+- **Page headers and cards** - page titles and every card or setting title now have comfortable, consistent spacing from their descriptions on all pages, so the lines no longer crowd or overlap. The System Monitor tiles and Performance Tools tiles got the same treatment.
+- **Performance Tools** - the Deep System Cleanup description now shows in full across both of its lines.
+- **System Restore** - the "What does Exoptimizer never touch?" button is wide enough to show its whole label.
+
+### 🗓️ Maintenance
+- Version bumped to 3.1.0 across the app, installer and documentation.
+
+## Version 3.0.1
+### 🗓️ Maintenance
+- Updated copyright and license year references from 2025 to 2026 (app UI, installer, README, LICENSE).
+
+### ✨ New Features
+- **Automatic update checker** - Exoptimizer now checks GitHub for a newer release shortly after starting, and shows a small badge on the Settings tab if one is found. A "Check for Updates" button in Settings also lets you check manually at any time, with clear feedback either way (up to date, update available, or check failed).
+- **In-app changelog viewer** - a "View Changelog" button in Settings opens this changelog inside the app itself, with one tab per version, newest first.
+
 ## Version 3.0.0
 ### 🛡️ Critical Safety Fixes
 This release fixes the root cause of the most common issues reported against 2.1.x: **restore points failing to create or apply, System Restore no longer working, and the network adapter/service failing to start after optimizing.** All of it traced back to the same mistake - several optimization presets were setting critical Windows services (System Restore's VSS/swprv, and the network stack's nsi/NlaSvc/iphlpsvc/RasMan) to "Disabled" instead of "Manual", which stops Windows itself from ever starting them again.
