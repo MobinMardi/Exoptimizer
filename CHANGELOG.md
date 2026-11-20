@@ -1,5 +1,80 @@
 # Exoptimizer Changelog
 
+## Version 3.2.0
+### 🛡️ Safety & Reliability Release
+Every finding from the v3.1.0 review is addressed here. The goal: Exoptimizer never changes something it can't put back, never claims success it hasn't verified, and never changes your security settings without you explicitly asking.
+
+### 🔙 Exact Undo (recovery journal)
+- **Original values are recorded first** - before any service, registry value, power setting or TCP setting is changed, its original state (including "didn't exist") is written to a durable recovery journal in `%ProgramData%\Exoptimizer`. If a change can't be recorded, it is **not made**.
+- **Undo restores exactly what was there** instead of guessing Windows defaults. It restores service start types (including delayed-start) and whether each service was running, registry values, the previous power plan and every power setting that was changed, TCP settings, and removes only the Defender exclusions Exoptimizer added.
+- **Safer journal** - written atomically with a backup copy, locked to SYSTEM and Administrators, and validated entry by entry when read (invalid names, protected services and unrecognised registry values are ignored). A damaged file is set aside instead of silently lost. State saved by older versions is imported automatically.
+- **Removed risky "undo" actions** - Undo no longer runs a global Winsock/TCP reset, and no longer forces the High performance plan or fixed registry defaults.
+- **Honest scope** - if there is nothing recorded (for example changes made by versions before 3.2.0), Undo says so instead of pretending.
+
+### 🔐 Windows Defender is opt-in
+- **Two separate, off-by-default toggles**: "Exclude Riot Games folders from Defender scans" and "Turn off Defender real-time protection". Neither happens silently any more (previously scan exclusions were added on every run).
+- **Full disclosure before anything changes** - the confirmation lists the exact folders and the real-time protection choice, and turning on real-time protection off needs its own warning prompt.
+- **Verified, not assumed** - after the change, Exoptimizer asks Windows whether real-time protection is actually off. If Tamper Protection or a policy blocked it, the change is rolled back and reported as failed.
+- **No duplicate actions** - Extreme mode no longer touches Defender on its own; both modes follow your two toggles. The old Extreme status check (which looked at a value Extreme never wrote) is gone.
+- **Safer exclusions** - only folders that exist are added, resolved from the real Windows folders rather than a hard-coded user name, and never an exclusion that was already there.
+
+### 🧯 Restore points you can trust
+- **Created, then confirmed** - Exoptimizer asks Windows for the restore point and then checks that it really exists.
+- **If it fails, nothing changes** - you must explicitly choose to continue without one (the default answer is No).
+- **No permanent system changes** - the "one restore point per 24 hours" limit is lifted only while the request runs and then put back, and System Protection is only turned on if you agree.
+- **Installer fixed** - the installer's restore point used an invalid type and always failed while reporting success. It now creates the restore point, verifies it, and tells you the truth.
+
+### ⚙️ Reliable operations
+- **One operation at a time** - Optimize, Extreme, Battery, Quick Boost, Undo, Repair, Cleanup and restore points are gated, so conflicting actions can't overlap (even across two windows). Navigation is disabled while one runs, and closing the app or exiting from the tray is blocked until it finishes.
+- **No more UI-pumping** - work runs in the background instead of `Application.DoEvents()`, so the window stays responsive and can't be re-entered.
+- **Real results** - every step reports what happened item by item (applied, skipped, failed) with exit codes. Success is shown only when everything succeeded; otherwise you see exactly what failed and it is **not** marked as optimized.
+- **Safe command running** - external tools are run with timeouts, drained output (no hangs on large output) and checked exit codes. PowerShell scripts are passed encoded, so paths and names can't break out of a command line.
+- **Progress is honest** - the bar reaches 100% only after the last step finishes.
+
+### 🧰 Service handling
+- Services are only changed after their original start type and running state were read and saved; unreadable or unsaved services are left alone.
+- Services that you or Windows already disabled are no longer switched on, and services Windows itself protects (such as Update Medic) are reported as skipped instead of failing.
+- Restoring a service verifies the result and keeps unsuccessful entries so you can retry.
+
+### 🧹 Deep Cleanup
+- **Preview and choose** - see how much each category holds and choose what to clean. Logs and crash dumps are no longer deleted by default.
+- **Safer deletion** - links and junctions are never followed, files in use are skipped, and paths are resolved from Windows instead of hard-coded.
+- **Windows Update is restored** - the service is paused only if it was running and is always started again afterwards, even if cleanup fails.
+- **Real summary** - how much space was freed and how many files were skipped.
+
+### 🩺 Repair Critical Services
+- **Preview first** - shows exactly which services and Defender policy values would change, and starts only automatic services.
+- **Backs up before changing** - current values are saved first; if that fails, nothing is changed.
+- **Warns on managed PCs** - domain-joined or device-managed computers get an extra warning because those settings may be intentional.
+- **Verified** - each change is checked and failures are listed.
+
+### 📊 Honest status and features
+- **Optimized status comes from what Exoptimizer actually did** (recorded runs), not a guess from system state. A partly failed run shows "Retry Optimization" instead of being stuck or falsely complete.
+- **Quick Boost is real** - it now switches to the High performance plan and clears the DNS cache (and Undo restores your plan). Before, it only showed a success message.
+- **VALORANT priority fixed** - the network QoS policy now uses the supported Windows QoS commands and reports failures. Previously the command could silently fail while the app said it worked.
+- **Network tuning only when needed** - TCP auto-tuning and RSS are changed only if they differ from healthy defaults, and the previous values are recorded.
+- **Startup entries are reversible** - Extreme mode disables common launchers using the same switch as Task Manager's Startup tab (current user only) instead of an unreliable legacy command.
+- **Vanguard start reports the real outcome.**
+
+### 🧱 Installer
+- **Your recovery data is kept on uninstall** (asking you at the end) so Undo still works after a reinstall; settings are removed as before.
+- **No duplicate "Installed apps" entry** - the extra hand-written uninstall registration is gone (and removed on upgrade).
+- **Running copies are detected** - Exoptimizer now holds the single-instance lock the installer was already checking for, so a running copy is closed cleanly before updating.
+
+### 🏗️ Build, release & supply chain
+- **Upgraded to .NET 10 (LTS)** - .NET 6 is long out of support; .NET 8 reached end of support on 10 November 2026.
+- **Reproducible release workflow** - a tagged release is built on GitHub Actions, checks that the packaged app version matches the tag, produces `SHA256SUMS.txt`, and creates build-provenance attestations for the installer and the app. Code signing is supported when a certificate secret is configured.
+- **Build checks on every change** - the project builds and runs automated tests on Windows for each push and pull request. New tests cover service-name validation, journal validation and atomic saving (including failure injection), output parsing, command running (large output, timeouts) and the operation gate.
+- **Fixed the README build instructions.**
+
+### 🎨 Layout polish
+- **Roomier window** - the window is a little taller (one size on every page), so the last card on System Optimization no longer sits against the bottom edge. It now has the same breathing room below it as the page title has above.
+- **Defender options fully readable** - the descriptions under "Exclude Riot Games folders from Defender scans" and "Turn off Defender real-time protection" now have room for two lines, so nothing is cut off, and both rows share the same even spacing.
+- **Sidebar header** - a little more space between the app name and its version number.
+
+### 🗓️ Maintenance
+- Version bumped to 3.2.0 across the app, installer, documentation and project files.
+
 ## Version 3.1.0
 ### 🎨 Complete UI/UX Overhaul
 A ground-up redesign of the interface - minimal, refined and neat - with **no change to what any button does**.

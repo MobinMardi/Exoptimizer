@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -21,11 +22,14 @@ namespace Exoptimizer
         private Color borderColor = Theme.Border;
         private int radius = 14;
 
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Color FillColor { get => fillColor; set { fillColor = value; Invalidate(); } }
 
         /// <summary>Use Color.Transparent for a card with no outline.</summary>
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Color BorderColor { get => borderColor; set { borderColor = value; Invalidate(); } }
 
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int Radius { get => radius; set { radius = value; Invalidate(); } }
 
         public CardPanel()
@@ -79,11 +83,14 @@ namespace Exoptimizer
         private ButtonKind kind = ButtonKind.Filled;
         private Color tint = Color.Empty;
 
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ButtonKind Kind { get => kind; set { kind = value; Invalidate(); } }
 
         /// <summary>Optional semantic color (danger, warning...) for Soft and Ghost buttons.</summary>
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Color Tint { get => tint; set { tint = value; Invalidate(); } }
 
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int Radius { get; set; } = 10;
 
         public ModernButton()
@@ -342,11 +349,14 @@ namespace Exoptimizer
         private bool selected;
         private bool showDot;
 
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string Section { get; set; } = string.Empty;
 
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool Selected { get => selected; set { selected = value; Invalidate(); } }
 
         /// <summary>Small red dot used to flag an available update.</summary>
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool ShowDot { get => showDot; set { showDot = value; Invalidate(); } }
 
         public NavItem()
@@ -364,6 +374,8 @@ namespace Exoptimizer
         protected override void OnMouseLeave(EventArgs e) { hover = false; Invalidate(); base.OnMouseLeave(e); }
 
         protected override void OnTextChanged(EventArgs e) { base.OnTextChanged(e); Invalidate(); }
+
+        protected override void OnEnabledChanged(EventArgs e) { hover = false; base.OnEnabledChanged(e); Invalidate(); }
 
         protected override void OnGotFocus(EventArgs e) { base.OnGotFocus(e); Invalidate(); }
 
@@ -393,7 +405,7 @@ namespace Exoptimizer
 
             var rect = new RectangleF(0.5f, 0.5f, Width - 1f, Height - 1f);
 
-            if (selected || hover)
+            if (selected || (hover && Enabled))
             {
                 using var path = Gfx.RoundedRect(rect, 10f);
                 using var brush = new SolidBrush(selected ? Theme.AccentSoft : Theme.Hover);
@@ -408,7 +420,7 @@ namespace Exoptimizer
                 g.FillPath(barBrush, barPath);
             }
 
-            Color textColor = selected ? Theme.AccentText : hover ? Theme.TextPrimary : Theme.TextSecondary;
+            Color textColor = !Enabled ? Theme.TextTertiary : selected ? Theme.AccentText : hover ? Theme.TextPrimary : Theme.TextSecondary;
             var textBounds = new Rectangle(26, 0, Width - 26 - (showDot ? 34 : 12), Height);
             TextRenderer.DrawText(g, Text, Theme.Font(10f, selected), textBounds, textColor,
                 TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine |
@@ -533,6 +545,7 @@ namespace Exoptimizer
     {
         private bool hover;
 
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string Description { get; set; } = string.Empty;
 
         public ToolTile()
@@ -607,6 +620,7 @@ namespace Exoptimizer
     {
         private int value;
 
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int Value
         {
             get => value;

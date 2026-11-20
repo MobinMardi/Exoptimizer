@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System;
 using System.Drawing;
 using System.Media;
@@ -27,8 +28,12 @@ namespace Exoptimizer
             => Show(text, caption, buttons, MessageBoxIcon.None);
 
         public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+            => Show(text, caption, buttons, icon, MessageBoxDefaultButton.Button1);
+
+        /// <param name="defaultButton">Button2 makes the second button (No / Cancel) the default - use it for risky confirmations.</param>
+        public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton)
         {
-            using var dialog = new AppDialog(text, caption, buttons, icon);
+            using var dialog = new AppDialog(text, caption, buttons, icon, defaultButton);
 
             Form? owner = Form.ActiveForm;
             if (owner != null && owner.Visible && !owner.IsDisposed)
@@ -41,7 +46,7 @@ namespace Exoptimizer
 
         private readonly MessageBoxIcon iconKind;
 
-        private AppDialog(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+        private AppDialog(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton)
         {
             iconKind = icon;
 
@@ -152,9 +157,10 @@ namespace Exoptimizer
             primary.Location = new Point(right - primary.Width, buttonTop);
             footer.Controls.Add(primary);
 
-            AcceptButton = primary;
+            bool secondDefault = defaultButton == MessageBoxDefaultButton.Button2 && secondary != null;
+            AcceptButton = secondDefault ? secondary : primary;
             CancelButton = secondary ?? primary;
-            ActiveControl = primary;
+            ActiveControl = secondDefault ? secondary : primary;
         }
 
         private static ModernButton MakeButton(string text, DialogResult result, ButtonKind kind)
@@ -320,6 +326,7 @@ namespace Exoptimizer
             ClientSize = new Size(width, height);
         }
 
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string Status
         {
             get => statusLabel.Text;
@@ -330,6 +337,7 @@ namespace Exoptimizer
             }
         }
 
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int Value
         {
             get => bar.Value;

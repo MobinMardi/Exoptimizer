@@ -1,4 +1,4 @@
-Exoptimizer v3.1.0 - Advanced Gaming Optimization Tool
+Exoptimizer v3.2.0 - Advanced Gaming Optimization Tool
 =====================================================
 
 🎮 OVERVIEW:
@@ -8,7 +8,8 @@ Exoptimizer is a comprehensive Windows gaming optimization tool designed to maxi
 • Windows 10 version 2004 (build 19041) or later / Windows 11
 • 64-bit processor and operating system
 • Administrator privileges required for full functionality
-• .NET 6.0 Runtime (included in installer)
+• .NET 10 Runtime (bundled with the app - nothing separate to install)
+• Display: 1280 x 800 or larger recommended (the window has a fixed size of 1180 x 720)
 • Minimum 4GB RAM recommended
 • 100MB free disk space for installation
 
@@ -19,10 +20,10 @@ Exoptimizer is a comprehensive Windows gaming optimization tool designed to maxi
 • Network settings optimization for reduced latency
 • Registry tweaks for enhanced gaming performance
 • Power management optimization (performance or battery modes)
-• Windows Defender exclusions for gaming directories
+• Optional Windows Defender exclusions for your Riot Games folders (off by default, reversible)
 • 🔥 EXTREME OPTIMIZATION mode for maximum FPS boost
 • 🔥 Aggressive non-essential service tuning and visual effects removal
-• 🔥 Windows Defender real-time protection toggle (safe, fully reversible)
+• Optional Windows Defender real-time protection toggle (off by default, verified, reversible)
 
 🎯 VALORANT Integration:
 • Process priority boosting with High/RealTime priority options
@@ -46,7 +47,7 @@ Exoptimizer is a comprehensive Windows gaming optimization tool designed to maxi
 • System Restore, networking, and firewall services are never disabled by
   any optimization mode, at any setting - see "What does Exoptimizer never
   touch?" in the System Restore tab for the full protected list
-• Automatic system restore point creation before changes
+• Verified system restore point creation before changes
 • One-click system restore access for quick recovery
 • Comprehensive optimization rollback with "Undo Optimizations" that restores
   every changed service to its exact original state
@@ -108,9 +109,9 @@ Exoptimizer is a comprehensive Windows gaming optimization tool designed to maxi
 • For technical issues: Check Windows Event Viewer for detailed error logs
 • Before contacting support: Try "Reset to Defaults" in Settings
 
-Version: 3.1.0
+Version: 3.2.0
 Developer: mDev (Mobin Mardi)
 Copyright © 2026 - Licensed under MIT License
-Built with .NET 6.0 for Windows 10/11
+Built with .NET 10 for Windows 10/11
 
 Thank you for choosing Exoptimizer for your gaming optimization needs!

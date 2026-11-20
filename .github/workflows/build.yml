@@ -1,0 +1,28 @@
+name: Build and test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore src/Exoptimizer.csproj
+
+      - name: Build
+        run: dotnet build src/Exoptimizer.csproj -c Release --no-restore
+
+      - name: Test
+        run: dotnet test tests/Exoptimizer.Tests/Exoptimizer.Tests.csproj -c Release

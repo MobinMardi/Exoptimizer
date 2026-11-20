@@ -22,7 +22,7 @@ namespace Exoptimizer
         // ---- Layout -------------------------------------------------------------------
 
         private const int WindowWidth = 1180;
-        private const int WindowHeight = 680;
+        private const int WindowHeight = 720; // one size for every page; leaves the same ~28 px under the last card as above the page title
         private const int SidebarWidth = 244;
         private const int PageMargin = 48;
         private const int PageWidth = WindowWidth - SidebarWidth - PageMargin * 2; // 840
@@ -44,6 +44,7 @@ namespace Exoptimizer
         private NavItem? settingsNavItem;
 
         private ModernButton? extremeOptimizeButton;
+        private ToggleSwitch? exclusionsToggle;
 
         private MetricTile? cpuTile;
         private MetricTile? memoryTile;
@@ -239,8 +240,8 @@ namespace Exoptimizer
             const TextFormatFlags flags = TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine |
                                           TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix | TextFormatFlags.NoPadding;
 
-            TextRenderer.DrawText(g, "Exoptimizer", Theme.Font(14f, true), new Rectangle(76, 27, 150, 24), Theme.TextPrimary, flags);
-            TextRenderer.DrawText(g, "v" + AppVersion, Theme.Font(9f), new Rectangle(76, 49, 150, 18), Theme.TextTertiary, flags);
+            TextRenderer.DrawText(g, "Exoptimizer", Theme.Font(14f, true), new Rectangle(76, 24, 150, 24), Theme.TextPrimary, flags);
+            TextRenderer.DrawText(g, "v" + AppVersion, Theme.Font(9f), new Rectangle(76, 52, 150, 18), Theme.TextTertiary, flags);
 
             // Privilege indicator
             Color tone = isElevated ? Theme.Success : Theme.Warning;
@@ -304,6 +305,7 @@ namespace Exoptimizer
             optimizeButton = null;
             extremeOptimizeButton = null;
             defenderCheckBox = null;
+            exclusionsToggle = null;
             valorantEnablePriority = null;
             valorantDisablePriority = null;
             valorantStatusLabel = null;
@@ -407,7 +409,7 @@ namespace Exoptimizer
             });
 
             const int cardW = 408;
-            const int cardH = 160;
+            const int cardH = 152;
             const int gap = 24;
             int row1 = y + 52 + 16;
             int row2 = row1 + cardH + 16;
@@ -416,52 +418,82 @@ namespace Exoptimizer
             // Optimize System
             var optimizeCard = AddCard(page, x, row1, cardW, cardH);
             AddCardText(optimizeCard, "Optimize System",
-                "Creates a restore point, then tunes services, network, power plan and registry for smoother gameplay.");
-            optimizeButton = MakeButton(
-                isOptimized ? "✓ System Optimized" : "Optimize System",
-                new Rectangle(24, 106, 180, 38),
-                ButtonKind.Filled,
-                isOptimized ? SuccessColor : PrimaryColor);
+                "Creates and verifies a restore point, then tunes services, network, power plan and registry. Every change is recorded for Undo.");
+            optimizeButton = MakeButton("Optimize System", new Rectangle(24, 104, 190, 38), ButtonKind.Filled, PrimaryColor);
             optimizeButton.Click += OptimizeButton_Click;
-            if (isOptimized) optimizeButton.Enabled = false;
             optimizeCard.Controls.Add(optimizeButton);
 
             // Quick Boost
             var quickCard = AddCard(page, col2, row1, cardW, cardH);
-            AddCardText(quickCard, "Quick Boost", "A light, one-click boost for quick sessions.");
-            var quickButton = MakeButton("Quick Boost", new Rectangle(24, 106, 150, 38), ButtonKind.Soft);
-            quickButton.Click += (s, e) => AppDialog.Show("Quick optimization applied!", "Exoptimizer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            AddCardText(quickCard, "Quick Boost", "Switches to the High performance power plan and clears the DNS cache. Undo restores your previous plan.");
+            var quickButton = MakeButton("Quick Boost", new Rectangle(24, 104, 150, 38), ButtonKind.Soft);
+            quickButton.Click += QuickBoostButton_Click;
             quickCard.Controls.Add(quickButton);
 
             // Extreme Optimization
             var extremeCard = AddCard(page, x, row2, cardW, cardH);
             AddCardText(extremeCard, "Extreme Optimization",
-                "Disables many non-essential Windows features for maximum FPS. A restore point is created first - use with caution.");
-            extremeOptimizeButton = MakeButton(
-                isExtremeOptimized ? "✓ Extreme Applied" : "Extreme Optimization",
-                new Rectangle(24, 106, 196, 38),
-                ButtonKind.Filled,
-                isExtremeOptimized ? SuccessColor : DangerColor);
+                "Disables many non-essential Windows features for maximum FPS. A restore point is created and verified first - use with caution.");
+            extremeOptimizeButton = MakeButton("Extreme Optimization", new Rectangle(24, 104, 200, 38), ButtonKind.Filled, DangerColor);
             extremeOptimizeButton.Click += ExtremeOptimizeButton_Click;
-            if (isExtremeOptimized) extremeOptimizeButton.Enabled = false;
             extremeCard.Controls.Add(extremeOptimizeButton);
 
             // Longer Battery
             var batteryCard = AddCard(page, col2, row2, cardW, cardH);
             AddCardText(batteryCard, "Longer Battery",
-                "Optimizes power settings for extended battery life during power outages and when unplugged from AC power.");
-            var batteryButton = MakeButton("Longer Battery", new Rectangle(24, 106, 150, 38), ButtonKind.Soft);
+                "Switches to the Power Saver plan and trims background services for longer battery life when unplugged.");
+            var batteryButton = MakeButton("Longer Battery", new Rectangle(24, 104, 150, 38), ButtonKind.Soft);
             batteryButton.Click += BatteryOptimizeButton_Click;
             batteryCard.Controls.Add(batteryButton);
 
-            // Advanced option
-            var advancedCard = AddCard(page, x, row2 + cardH + 16, PageWidth, 72);
-            advancedCard.Controls.Add(MakeLabel("Disable Windows Defender real-time protection", 10.5f, true, Theme.TextPrimary,
-                new Rectangle(24, 12, 680, 26)));
-            advancedCard.Controls.Add(MakeLabel("Advanced option, fully reversible. Applied when you run Optimize System.", 9.5f, false, Theme.TextSecondary,
-                new Rectangle(24, 40, 680, 22)));
-            defenderCheckBox = new ToggleSwitch { Location = new Point(PageWidth - 24 - 48, 22) };
-            advancedCard.Controls.Add(defenderCheckBox);
+            // Windows Defender options - both off by default, and kept while you move between pages.
+            // Each row has room for a two-line description so a longer text is never cut off.
+            var advancedCard = AddCard(page, x, row2 + cardH + 16, PageWidth, 163);
+
+            advancedCard.Controls.Add(MakeLabel("Exclude Riot Games folders from Defender scans", 10.5f, true, Theme.TextPrimary,
+                new Rectangle(24, 12, 680, 22)));
+            advancedCard.Controls.Add(MakeLabel("Off by default. Skips scanning your Riot Games folders; Undo removes only what Exoptimizer added.", 9.5f, false, Theme.TextSecondary,
+                new Rectangle(24, 34, 716, 36)));
+            exclusionsToggle = new ToggleSwitch { Location = new Point(PageWidth - 24 - 48, 27), Checked = optAddExclusions };
+            exclusionsToggle.CheckedChanged += (s, e) => optAddExclusions = exclusionsToggle != null && exclusionsToggle.Checked;
+            advancedCard.Controls.Add(exclusionsToggle);
+
+            advancedCard.Controls.Add(MakeDivider(24, 80, PageWidth - 48));
+
+            advancedCard.Controls.Add(MakeLabel("Turn off Defender real-time protection", 10.5f, true, Theme.TextPrimary,
+                new Rectangle(24, 93, 680, 22)));
+            advancedCard.Controls.Add(MakeLabel("Off by default. Advanced: Tamper Protection may block it, and Undo restores it.", 9.5f, false, Theme.TextSecondary,
+                new Rectangle(24, 115, 716, 36)));
+
+            var realtimeToggle = new ToggleSwitch { Location = new Point(PageWidth - 24 - 48, 108), Checked = optDisableRealtime };
+            bool reverting = false;
+            realtimeToggle.CheckedChanged += (s, e) =>
+            {
+                if (reverting) return;
+
+                if (realtimeToggle.Checked)
+                {
+                    var confirmRealtime = AppDialog.Show(
+                        "Turn off Windows Defender real-time protection when optimizing?" + Environment.NewLine + Environment.NewLine +
+                        "Your PC will be less protected against malware while it is off. Exoptimizer records the original setting, checks that Windows really applied the change, and Undo turns it back on.",
+                        "Turn off real-time protection?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+
+                    if (confirmRealtime != DialogResult.Yes)
+                    {
+                        reverting = true;
+                        realtimeToggle.Checked = false;
+                        reverting = false;
+                        optDisableRealtime = false;
+                        return;
+                    }
+                }
+
+                optDisableRealtime = realtimeToggle.Checked;
+            };
+            defenderCheckBox = realtimeToggle;
+            advancedCard.Controls.Add(realtimeToggle);
+
+            RefreshOptimizationButtons();
         }
 
         private void LoadValorantContent()
@@ -547,7 +579,7 @@ namespace Exoptimizer
 
             var cleanupCard = AddCard(page, x, 124 + 242 + 16, PageWidth, 168);
             AddCardText(cleanupCard, "Deep System Cleanup",
-                "Safely removes temporary files, logs, cache, and unnecessary system files without affecting running processes or games.", 44);
+                "Choose what to clean and see how much each category holds first. Files in use are skipped; logs and crash dumps are kept unless you select them.", 44);
             var deepCleanupBtn = MakeButton("Deep System Cleanup", new Rectangle(24, 108, 200, 40), ButtonKind.Filled);
             deepCleanupBtn.Click += DeepCleanupButton_Click;
             cleanupCard.Controls.Add(deepCleanupBtn);
@@ -630,7 +662,7 @@ namespace Exoptimizer
 
             var repairCard = AddCard(page, x, 124 + 150 + 16, PageWidth, 164);
             AddCardText(repairCard, "Upgraded from an older Exoptimizer version?",
-                "If restore points, your network, or Windows Defender were left disabled by an older version, this resets those specific services back to how Windows ships them.", 40);
+                "If critical services or Defender policies were left changed by an older version or another tool, this previews exactly what would change, saves your current values, then moves them back toward how Windows ships them.", 40);
 
             var repairBtn = MakeButton("Repair Critical Services", new Rectangle(24, 104, 210, 40), ButtonKind.Filled, SuccessColor);
             repairBtn.Click += RepairCriticalServicesButton_Click;

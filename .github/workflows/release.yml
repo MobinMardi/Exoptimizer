@@ -1,0 +1,106 @@
+name: Release
+
+# Push a tag such as v3.2.0 to build, package and draft a release.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write        # create the draft release
+  id-token: write        # build provenance (OIDC)
+  attestations: write    # build provenance
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      # Code signing is optional: add SIGNING_CERT_BASE64 (a .pfx, base64) and SIGNING_CERT_PASSWORD as repository secrets.
+      HAS_CERT: ${{ secrets.SIGNING_CERT_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Check the tag matches the project version
+        shell: pwsh
+        run: |
+          $tag = '${{ github.ref_name }}'.TrimStart('v')
+          [xml]$proj = Get-Content src/Exoptimizer.csproj
+          $version = ($proj.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ }) | Select-Object -First 1
+          if ($version -ne $tag) { throw "Tag v$tag does not match the project version $version" }
+          $iss = Get-Content installer/exoptimizer_installer.iss -Raw
+          if ($iss -notmatch [regex]::Escape("#define MyAppVersion `"$tag`"")) { throw "installer/exoptimizer_installer.iss does not define MyAppVersion $tag" }
+          Write-Host "Version $tag is consistent."
+
+      - name: Test
+        run: dotnet test tests/Exoptimizer.Tests/Exoptimizer.Tests.csproj -c Release
+
+      - name: Publish the app
+        run: dotnet publish src/Exoptimizer.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
+
+      - name: Check the packaged app version
+        shell: pwsh
+        run: |
+          $tag = '${{ github.ref_name }}'.TrimStart('v')
+          $exe = 'src/bin/Release/net10.0-windows/win-x64/publish/Exoptimizer.exe'
+          $actual = (Get-Item $exe).VersionInfo.ProductVersion
+          if (-not $actual.StartsWith($tag)) { throw "Packaged app reports version $actual but the tag is v$tag" }
+          Write-Host "Packaged app reports $actual."
+
+      - name: Locate signtool
+        if: env.HAS_CERT == 'true'
+        shell: pwsh
+        run: |
+          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
+            Where-Object { $_.FullName -match '\\x64\\' } | Sort-Object FullName -Descending | Select-Object -First 1
+          if (-not $signtool) { throw 'signtool.exe was not found on this runner.' }
+          "SIGNTOOL=$($signtool.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+          [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\cert.pfx", [Convert]::FromBase64String('${{ secrets.SIGNING_CERT_BASE64 }}'))
+
+      - name: Sign the app
+        if: env.HAS_CERT == 'true'
+        shell: pwsh
+        run: |
+          & $env:SIGNTOOL sign /f "$env:RUNNER_TEMP\cert.pfx" /p '${{ secrets.SIGNING_CERT_PASSWORD }}' /fd sha256 /tr http://timestamp.digicert.com /td sha256 src/bin/Release/net10.0-windows/win-x64/publish/Exoptimizer.exe
+          if ($LASTEXITCODE -ne 0) { throw 'Signing the app failed.' }
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build the installer
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" installer/exoptimizer_installer.iss
+          if ($LASTEXITCODE -ne 0) { throw 'The installer failed to build.' }
+
+      - name: Sign the installer
+        if: env.HAS_CERT == 'true'
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem installer/output/*.exe | Select-Object -First 1
+          & $env:SIGNTOOL sign /f "$env:RUNNER_TEMP\cert.pfx" /p '${{ secrets.SIGNING_CERT_PASSWORD }}' /fd sha256 /tr http://timestamp.digicert.com /td sha256 $installer.FullName
+          if ($LASTEXITCODE -ne 0) { throw 'Signing the installer failed.' }
+
+      - name: Checksums
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem installer/output/*.exe
+          $files | Get-FileHash -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  $(Split-Path $_.Path -Leaf)" } | Out-File -Encoding ascii installer/output/SHA256SUMS.txt
+          Get-Content installer/output/SHA256SUMS.txt
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            installer/output/*.exe
+            src/bin/Release/net10.0-windows/win-x64/publish/Exoptimizer.exe
+
+      - name: Draft the release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: |
+            installer/output/*.exe
+            installer/output/SHA256SUMS.txt

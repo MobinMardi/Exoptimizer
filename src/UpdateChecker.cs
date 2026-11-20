@@ -92,7 +92,7 @@ namespace Exoptimizer
             }
         }
 
-        /// <summary>System.Version needs at least a Major.Minor and only numeric parts (e.g. "3.1.0", not "3.1.0-beta"); this pads/guards for that.</summary>
+        /// <summary>System.Version needs at least a Major.Minor and only numeric parts (e.g. "3.2.0", not "3.2.0-beta"); this pads/guards for that.</summary>
         private static bool TryParseVersion(string text, out Version? version)
         {
             string candidate = text.Split('-', '+')[0].Trim(); // drop any "-beta"/"+build" suffix

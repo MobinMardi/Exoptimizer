@@ -8,10 +8,10 @@
 
 <div align="center">
 
-  [![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
+  [![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
   [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
   [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey.svg)]()
-  [![.NET](https://img.shields.io/badge/.NET-6.0-purple.svg)]()
+  [![.NET](https://img.shields.io/badge/.NET-10.0-purple.svg)]()
 
 </div>
 
@@ -24,9 +24,9 @@
 - **Network Settings Optimization**: Reduced latency and improved connection stability
 - **Registry Tweaks**: Enhanced gaming performance through system-level optimizations
 - **Power Management**: Performance or battery optimization modes
-- **Windows Defender Exclusions**: Gaming directory protection from real-time scanning
+- **Optional Windows Defender Exclusions**: Off by default - excludes your existing Riot Games folders from scans, shows the exact folders first, and Undo removes only what Exoptimizer added
 - **Extreme Optimization**: Maximum FPS boost with aggressive system tweaks
-- **Quick Boost**: Fast performance enhancement for immediate gaming sessions
+- **Quick Boost**: Switches to the High performance power plan and clears the DNS cache (Undo restores your plan)
 
 ### 🎯 VALORANT Integration
 - **Process Priority Boosting**: High/RealTime priority options for VALORANT
@@ -48,9 +48,9 @@
 
 ### 💾 System Safety
 - **Protected Services**: System Restore, networking, and firewall services can never be disabled by any optimization mode - see [CHANGELOG](docs/CHANGELOG.md#version-300) for the full list
-- **Automatic Restore Points**: System backup before applying optimizations, with reliability fixes so creation doesn't silently fail
+- **Verified Restore Points**: A restore point is created and then confirmed before optimizing; if it can't be created nothing changes unless you explicitly choose to continue
 - **One-click System Restore**: Quick recovery access for system issues
-- **Comprehensive Rollback**: "Undo Optimizations" restores every changed service to its exact original state, not a hardcoded guess
+- **Exact Rollback**: Every service, registry value, power and TCP setting is recorded before it is changed, and "Undo Optimizations" restores exactly that - not a hardcoded guess
 - **Repair Critical Services**: One-click fix for machines upgraded from an older Exoptimizer version
 - **Safe Optimization Detection**: Prevents duplicate optimization applications
 - **Extreme Optimization Detection**: Smart detection of already applied extreme tweaks
@@ -69,7 +69,8 @@
 - **Operating System**: Windows 10 version 2004 (build 19041) or later / Windows 11
 - **Architecture**: 64-bit processor and operating system
 - **Privileges**: Administrator privileges required for full functionality
-- **Runtime**: .NET 6.0 Runtime (included in installer)
+- **Runtime**: .NET 10 Runtime (bundled with the app - nothing separate to install)
+- **Display**: 1280 x 800 or larger recommended (the window has a fixed size of 1180 x 720)
 - **Memory**: Minimum 4GB RAM recommended
 - **Storage**: 100MB free disk space for installation
 
@@ -94,13 +95,15 @@
 
 ### 🔧 Optimization Modes
 - **Optimize System**: Standard gaming optimizations for most users
-- **Quick Boost**: Fast performance enhancement for immediate gaming
+- **Quick Boost**: High performance power plan + DNS cache flush for immediate gaming
 - **Extreme Optimization**: Maximum FPS boost with aggressive tweaks (advanced users)
 - **Longer Battery**: Power-saving optimizations for laptop gaming
 
 ### ⚠️ Important Safety Notes
 - Always run Exoptimizer as Administrator for complete functionality
-- Create a system restore point before applying optimizations
+- Exoptimizer creates **and verifies** a system restore point before optimizing, and will not continue without your explicit approval if it cannot
+- Every change is recorded (original values) in `%ProgramData%\Exoptimizer\journal.json`, so "Undo Optimizations" restores exactly what was there
+- Windows Defender changes (real-time protection, folder exclusions) are separate, opt-in toggles that are **off by default**
 - Restart your computer after applying system-level optimizations
 - Use "Undo Optimizations" if you experience any system issues
 - **Extreme Optimization** is recommended only for experienced users
@@ -108,18 +111,40 @@
 
 ## 🔧 Building from Source
 
-```bash
+```powershell
 git clone https://github.com/MobinMardi/Exoptimizer.git
 cd Exoptimizer
-dotnet restore
-dotnet build --configuration Release
+
+# Build and run the tests
+dotnet restore src/Exoptimizer.csproj
+dotnet build src/Exoptimizer.csproj -c Release
+dotnet test tests/Exoptimizer.Tests/Exoptimizer.Tests.csproj -c Release
+
+# Publish the self-contained single-file app (used by the installer)
+dotnet publish src/Exoptimizer.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
+
+# Build the installer (needs Inno Setup 6): output goes to installer/output/
+iscc installer/exoptimizer_installer.iss
 ```
 
 ### Development Requirements
 - Visual Studio 2022 or Visual Studio Code
-- .NET 6.0 SDK
+- .NET 10 SDK
+- Inno Setup 6 (only to build the installer)
 - Windows 10/11 development environment
 - Administrator privileges for testing
+
+## 🔐 Verifying Your Download
+
+Each release publishes the installer and the app together with a `SHA256SUMS.txt` file and a GitHub build-provenance attestation, so you can check that a file was built from this repository by the project's release workflow:
+
+```powershell
+# Compare the hash with SHA256SUMS.txt
+Get-FileHash .\Exoptimizer-v3.2.0.exe -Algorithm SHA256
+
+# Verify the build attestation (needs the GitHub CLI)
+gh attestation verify .\Exoptimizer-v3.2.0.exe -R MobinMardi/Exoptimizer
+```
 
 ## 🔍 Troubleshooting
 
@@ -129,6 +154,7 @@ dotnet build --configuration Release
 - **VALORANT priority fails**: Restart VALORANT and try again
 - **Monitoring shows errors**: Check Windows services and permissions
 - **Settings don't save**: Verify write permissions in application directory
+- **Undo says "nothing to undo"**: changes made by versions before 3.2.0 were not recorded in detail - use a System Restore point, or "Repair Critical Services"
 
 ### Support Resources
 - Check Windows Event Viewer for detailed error logs
@@ -182,10 +208,10 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 
 - Thanks to the gaming community for feedback and suggestions
 - Special thanks to VALORANT players for testing and optimization insights
-- Built with .NET 6.0 and Windows Forms for optimal performance
+- Built with .NET 10 and Windows Forms for optimal performance
 
 ---
 
 ⭐ **Star this repository if you find it helpful!**
 
-**Version**: 3.1.0 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2026 - Licensed under MIT License
+**Version**: 3.2.0 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2026 - Licensed under MIT License

@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <RootNamespace>Exoptimizer.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+  <!--
+    The app is a self-contained WinForms executable, which a test project can't reference directly.
+    Instead the logic that does the risky work (no UI) is compiled into the test assembly from source.
+  -->
+  <ItemGroup>
+    <Compile Include="..\..\src\CommandRunner.cs" Link="Linked\CommandRunner.cs" />
+    <Compile Include="..\..\src\OperationResults.cs" Link="Linked\OperationResults.cs" />
+    <Compile Include="..\..\src\JournalModel.cs" Link="Linked\JournalModel.cs" />
+    <Compile Include="..\..\src\TweakCatalog.cs" Link="Linked\TweakCatalog.cs" />
+    <Compile Include="..\..\src\ChangeJournal.cs" Link="Linked\ChangeJournal.cs" />
+    <Compile Include="..\..\src\SystemGuard.cs" Link="Linked\SystemGuard.cs" />
+  </ItemGroup>
+
+</Project>
