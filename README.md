@@ -8,7 +8,7 @@
 
 <div align="center">
 
-  [![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
+  [![Version](https://img.shields.io/badge/version-3.2.1-blue.svg)](https://github.com/MobinMardi/Exoptimizer/releases)
   [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
   [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey.svg)]()
   [![.NET](https://img.shields.io/badge/.NET-10.0-purple.svg)]()
@@ -61,7 +61,7 @@
 - **System Tray Integration**: Minimize-to-tray functionality with background monitoring
 - **Settings Persistence**: Configuration saved across application restarts
 - **Customizable Interface**: Appearance and behavior customization options
-- **Automatic Update Checker**: Checks GitHub for a newer release on startup (with a manual "Check for Updates" button too) and notifies you without any intrusive popups
+- **Automatic Update Checker**: Checks GitHub for a newer release on startup (with a manual "Check for Updates" button too) and notifies you without any intrusive popups; when an update is found it sends you to the official website to download it
 - **In-App Changelog Viewer**: Browse release notes for the current and previous versions directly inside the app
 
 ## 📋 System Requirements
@@ -76,7 +76,7 @@
 
 ## 🚀 Installation
 
-1. Download the latest installer from [Releases](https://github.com/MobinMardi/Exoptimizer/releases)
+1. Download the latest installer from the [official website](https://mobinmardi.github.io/exoptimizer/) (release files and checksums are also published on [GitHub Releases](https://github.com/MobinMardi/Exoptimizer/releases))
 2. Right-click the installer and select **"Run as administrator"**
 3. Follow the installation wizard with recommended settings
 4. Choose installation options (desktop icon, startup, restore point)
@@ -140,10 +140,10 @@ Each release publishes the installer and the app together with a `SHA256SUMS.txt
 
 ```powershell
 # Compare the hash with SHA256SUMS.txt
-Get-FileHash .\Exoptimizer-v3.2.0.exe -Algorithm SHA256
+Get-FileHash .\Exoptimizer-v3.2.1.exe -Algorithm SHA256
 
 # Verify the build attestation (needs the GitHub CLI)
-gh attestation verify .\Exoptimizer-v3.2.0.exe -R MobinMardi/Exoptimizer
+gh attestation verify .\Exoptimizer-v3.2.1.exe -R MobinMardi/Exoptimizer
 ```
 
 ## 🔍 Troubleshooting
@@ -214,4 +214,4 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 
 ⭐ **Star this repository if you find it helpful!**
 
-**Version**: 3.2.0 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2026 - Licensed under MIT License
+**Version**: 3.2.1 | **Developer**: mDev (Mobin Mardi) | **Copyright**: © 2026 - Licensed under MIT License

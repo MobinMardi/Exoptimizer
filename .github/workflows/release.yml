@@ -1,6 +1,6 @@
 name: Release
 
-# Push a tag such as v3.2.0 to build, package and draft a release.
+# Push a tag such as v3.2.1 to build, package and draft a release.
 on:
   push:
     tags: ['v*']

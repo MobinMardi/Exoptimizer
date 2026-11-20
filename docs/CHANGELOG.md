@@ -1,5 +1,15 @@
 # Exoptimizer Changelog
 
+## Version 3.2.1
+### 🌐 Updates now point to the official website
+- **Download from the website** - when a new version is found, "Check for Updates" now offers to open the official Exoptimizer website (https://mobinmardi.github.io/exoptimizer/) instead of the GitHub releases page.
+- **Update check unchanged** - the check that runs quietly at start-up and when you press "Check for Updates" still reads the latest release information directly from GitHub, so new versions are detected exactly as before; only the download link changed.
+- **Clearer wording** - the update prompt now says it opens the website to download the update.
+- The installer's "updates" link also points to the website's Exoptimizer page.
+
+### 🗓️ Maintenance
+- Version bumped to 3.2.1 across the app, installer, documentation and project files.
+
 ## Version 3.2.0
 ### 🛡️ Safety & Reliability Release
 Every finding from the v3.1.0 review is addressed here. The goal: Exoptimizer never changes something it can't put back, never claims success it hasn't verified, and never changes your security settings without you explicitly asking.

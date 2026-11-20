@@ -15,7 +15,7 @@ namespace Exoptimizer
 {
     public partial class MainForm : Form
     {
-        public const string AppVersion = "3.2.0";
+        public const string AppVersion = "3.2.1";
 
         private bool isOptimized = false;
         private bool valorantPriorityActive = false;
@@ -155,12 +155,12 @@ namespace Exoptimizer
                 var openResult = AppDialog.Show(
                     $"A new version is available: v{result.LatestVersion}" + Environment.NewLine +
                     $"You're currently running v{AppVersion}." + Environment.NewLine + Environment.NewLine +
-                    "Open the release page now?",
+                    "Open the Exoptimizer website to download it?",
                     "Update Available", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
 
-                if (openResult == DialogResult.Yes && !string.IsNullOrWhiteSpace(result.ReleaseUrl))
+                if (openResult == DialogResult.Yes && !string.IsNullOrWhiteSpace(result.DownloadUrl))
                 {
-                    try { Process.Start(new ProcessStartInfo(result.ReleaseUrl) { UseShellExecute = true }); }
+                    try { Process.Start(new ProcessStartInfo(result.DownloadUrl) { UseShellExecute = true }); }
                     catch { }
                 }
             }

@@ -12,20 +12,24 @@ namespace Exoptimizer
         public bool Success { get; init; }
         public bool UpdateAvailable { get; init; }
         public string? LatestVersion { get; init; }
-        public string? ReleaseUrl { get; init; }
+        /// <summary>Where the user is sent to download the new version: always the official website, never the GitHub releases page.</summary>
+        public string? DownloadUrl { get; init; }
         public string? ErrorMessage { get; init; }
     }
 
     /// <summary>
     /// Checks the GitHub "latest release" API for a newer version than the
-    /// one currently running. Used both automatically on startup (silently -
+    /// one currently running; the version data still comes from GitHub, but
+    /// downloads are handled on the official website (see DownloadPageUrl).
+    /// Used both automatically on startup (silently -
     /// see MainForm.CheckForUpdatesOnStartupAsync) and from the manual
     /// "Check for Updates" button in Settings (which shows the result either way).
     /// </summary>
     internal static class UpdateChecker
     {
         private const string ReleasesApiUrl = "https://api.github.com/repos/MobinMardi/Exoptimizer/releases/latest";
-        private const string ReleasesPageUrl = "https://github.com/MobinMardi/Exoptimizer/releases";
+        // Where "download the update" leads. Only the version check reads GitHub.
+        internal const string DownloadPageUrl = "https://mobinmardi.github.io/exoptimizer/";
 
         // A single shared, long-lived HttpClient is the documented best
         // practice (creating one per call can exhaust sockets under load).
@@ -59,7 +63,6 @@ namespace Exoptimizer
                 using var doc = JsonDocument.Parse(json);
 
                 string? tag = doc.RootElement.TryGetProperty("tag_name", out var tagEl) ? tagEl.GetString() : null;
-                string? releaseUrl = doc.RootElement.TryGetProperty("html_url", out var urlEl) ? urlEl.GetString() : null;
 
                 if (string.IsNullOrWhiteSpace(tag))
                 {
@@ -79,7 +82,7 @@ namespace Exoptimizer
                     Success = true,
                     UpdateAvailable = latestVersion > currentVersion,
                     LatestVersion = latestVersionText,
-                    ReleaseUrl = string.IsNullOrWhiteSpace(releaseUrl) ? ReleasesPageUrl : releaseUrl
+                    DownloadUrl = DownloadPageUrl
                 };
             }
             catch (TaskCanceledException)

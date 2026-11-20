@@ -1,8 +1,9 @@
-; Exoptimizer v3.2.0 Installer Script
+; Exoptimizer v3.2.1 Installer Script
 #define MyAppName "Exoptimizer - Gaming Optimization Tool"
-#define MyAppVersion "3.2.0"
+#define MyAppVersion "3.2.1"
 #define MyAppPublisher "mDev (Mobin Mardi)"
 #define MyAppURL "https://mobinmardi.github.io/"
+#define MyAppUpdatesURL "https://mobinmardi.github.io/exoptimizer/"
 #define MyAppExeName "Exoptimizer.exe"
 #define MyAppDisplayName "Exoptimizer.exe"
 #define MyAppId "{{B2C3D4E5-F6G7-8901-BCDE-234567890123}"
@@ -16,7 +17,7 @@ AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
-AppUpdatesURL={#MyAppURL}
+AppUpdatesURL={#MyAppUpdatesURL}
 AppCopyright=Copyright © 2026 mDev (Mobin Mardi)
 
 ; Installation Settings
@@ -26,7 +27,7 @@ AllowNoIcons=yes
 LicenseFile=..\LICENSE.txt
 InfoBeforeFile=..\docs\README.txt
 OutputDir=output
-OutputBaseFilename=Exoptimizer-v3.2.0
+OutputBaseFilename=Exoptimizer-v3.2.1
 SetupIconFile=..\assets\icon-new.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 
@@ -46,12 +47,12 @@ UninstallDisplayName={#MyAppName} v{#MyAppVersion}
 UninstallFilesDir={app}\uninstall
 
 ; Version Info
-VersionInfoVersion=3.2.0
+VersionInfoVersion=3.2.1
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoDescription={#MyAppName} Setup
 VersionInfoCopyright=Copyright © 2026 mDev (Mobin Mardi)
 VersionInfoProductName={#MyAppName}
-VersionInfoProductVersion=3.2.0
+VersionInfoProductVersion=3.2.1
 
 ; Upgrade Settings
 AppMutex=ExoptimizerAppMutex
@@ -214,7 +215,7 @@ begin
   end;
 
   if CurStep = ssPostInstall then begin
-    MsgBox('Exoptimizer v3.2.0 has been installed successfully!' + #13#10 + #13#10 +
+    MsgBox('Exoptimizer v3.2.1 has been installed successfully!' + #13#10 + #13#10 +
            'IMPORTANT REMINDERS:' + #13#10 +
            '• Always run Exoptimizer as Administrator' + #13#10 +
            '• Exoptimizer creates and verifies a restore point before optimizing' + #13#10 +
